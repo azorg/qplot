@@ -1,0 +1,52 @@
+Установка в (x)ubuntu 14.04 LTS
+===============================
+
+* установить Qt5/designer (Qt5 ver >= 5.2.1) из репозитория Ubuntu 14.04:
+#apt-get install qttools5-dev qt5-default
+
+* установить qt-creator из репозитория Ubuntu (не обязательно):
+#apt-get install qtcreator
+
+* установить "свежий" qwt-6.1.x из исходников:
+* (в соответсвии с руководством QWT)
+* можно скачать релиз в qwt-6.1.2.tar.bz2, можно скачать из svn
+$ tar xjfv qwt-6.1.2.tar.bz2
+$ cd qwt-6.1.2
+ИЛИ
+$ svn checkout svn://svn.code.sf.net/p/qwt/code/branches/qwt-6.1 qwt-6.1-svn
+$ cd qwt-6.1-svn
+$ qmake, make
+# sudo make install
+
+* сделать вспомагательную символическую ссылку на каталог QWT:
+#ln -s /usr/local/qwt-6.1.x-svn /usr/local/qwt-svn
+или
+#ln -s /usr/local/qwt-6.1.y /usr/local/qwt
+
+* установить путь к QWT в "qplot.pro":
+QWT = /usr/local/qwt
+или
+QWT = /usr/local/qwt-svn
+
+* подключить библиотеки QWT, добавить файл /etc/ld.so.conf.d/qwt.conf:
+# qwt configuration
+/usr/local/qwt/lib
+
+* скачать с github исходные тексты QPlot:
+$ git clone https://github.com/azorg/qplot.git
+
+* собрать приложение:
+$cd ./qplot
+$qmake
+$make
+
+* скопиролвать qplot в нужную bin директорию, например:
+sudo cp qplot /usr/local/bin
+или
+sudo cp qplot /usr/opt/bin
+
+
+Установка в Windows
+===================
+<<Будет уточнено в дальнейшем>>
+

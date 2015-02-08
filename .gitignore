@@ -1,0 +1,12 @@
+_debug/*
+_release/*
+.build
+.git
+.dep
+.obj
+*.d
+*.o
+Makefile
+qplot
+qplot.exe
+
