@@ -39,7 +39,8 @@ private Q_SLOTS:
   // обработка сигналов от PlotArea
   void on_pa_clickOn(double xBottom, double xTop, // point by click
                      double yLeft,   double yRight,
-                     Qt::MouseButtons buttons);
+                     Qt::MouseButtons buttons,
+                     Qt::KeyboardModifiers modifiers);
 
   //!!! FIXME
   //void on_pa_scaled(double xBottom, double wBottom, // zoomed or scralled

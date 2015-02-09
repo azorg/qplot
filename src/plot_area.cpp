@@ -92,6 +92,7 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
 
   // magnifier
   d_magnifier = new QwtPlotMagnifier(this->canvas());
+  d_magnifier->setWheelModifiers(Qt::ControlModifier); // zoom with Control
 
   // установки по-умолчанию
   d_legend = (QwtLegend*)     0;
@@ -183,8 +184,6 @@ void PlotArea::resetZoom()
 void PlotArea::enableZoom(bool on)
 {
   qDebug("PlotArea::enableZoom(bool on=%s)", _b2s(on));
-
-  d_panner->setEnabled(on);
 
   d_zoomer[0]->setEnabled(on);
   d_zoomer[0]->zoom(0);
@@ -766,34 +765,64 @@ void PlotArea::zoomed(const QwtDoubleRect &)
 }
 #endif
 //----------------------------------------------------------------------------
-void PlotArea::mousePressEvent(QMouseEvent *evt)
+void PlotArea::mousePressEvent(QMouseEvent *event)
 {
-  Qt::MouseButtons buttons = evt->buttons();
+  Qt::MouseButtons buttons = event->buttons();
+  Qt::KeyboardModifiers modifiers = event->modifiers();
 
   const char *button = (buttons & Qt::LeftButton)  ? "LeftButton"  :
                        (buttons & Qt::RightButton) ? "RightButton" :
                        (buttons & Qt::MidButton)   ? "MidleButton" :
                                                      "UnknownButton";
   qDebug("PlotArea::mousePressEvent(%s)", button);
+  
+  if (modifiers == Qt::ControlModifier && (buttons & Qt::RightButton))
+  { // Ctrl + FightButton => reset zoom
+    if (d_picker->isEnabled()) // !checkZoom()
+      resetZoom(); // в режиме "zoom on" сочетание перехватывает Qwt
+    event->accept();
+    return;
+  }
+
+  if (modifiers == Qt::ShiftModifier && (buttons & Qt::LeftButton))
+  { // Shift + LeftButton => set center to cursor
+    center();
+    event->accept();
+    return;
+  }
 
   double        xBottom,  xTop,  yLeft,  yRight;
   getXY       (&xBottom, &xTop, &yLeft, &yRight);
-
-  emit clickOn( xBottom,  xTop,  yLeft,  yRight, buttons);
+  emit clickOn( xBottom,  xTop,  yLeft,  yRight, buttons, modifiers);
 }
 //----------------------------------------------------------------------------
-void PlotArea::mouseDoubleClickEvent(QMouseEvent *)
+void PlotArea::mouseDoubleClickEvent(QMouseEvent *event)
 {
   qDebug("PlotArea::mouseDoubleClickEvent()");
+  resetZoom();
+  event->accept();
+}
+//----------------------------------------------------------------------------
+void PlotArea::wheelEvent(QWheelEvent *event)
+{
+  Qt::KeyboardModifiers modifiers = event->modifiers();
+  qDebug("PlotArea::wheelEvent(delta=%i)", event->delta());
 
-  if (checkZoom())
-    resetZoom();
+  float numDegrees = (float) event->delta() / 8.;
+  float numSteps = numDegrees / 15.;
+
+  if (event->orientation() == Qt::Horizontal || modifiers == Qt::ShiftModifier)
+    scrollX(numSteps * d_conf.scrollXStep);
+  else
+    scrollY(numSteps * d_conf.scrollYStep);
+
+  event->accept();
 }
 //----------------------------------------------------------------------------
 void PlotArea::keyPressEvent(QKeyEvent *event)
 {
   int k = event->key();
-  int m = event->modifiers();
+  Qt::KeyboardModifiers m = event->modifiers();
   char key[2];
   key[0] = (char) k;
   key[1] = '\0';
@@ -823,38 +852,40 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
 
   if (k == Qt::Key_Z)
   { // "Z" -> zoom On/Off
-    bool on = !checkZoom();
+    bool on = d_picker->isEnabled(); // !checkZoom();
     enableZoom(on);
   }
   else if (k == Qt::Key_R)
   { // "R" -> reset zoom
     resetZoom();
   }
+  else if (k == Qt::Key_Escape)
+  { // "ESC" -> reset zoom
+    if(d_picker->isEnabled()) // !checkZoom()
+      resetZoom(); // в режиме "zoom on" ESC перехватывает Qwt
+  }
   else if (k == Qt::Key_L)
   { // "L" -> legend On/Off
     bool on = !checkLegend();
     enableLegend(on);
-    emit legendOn(on);
   }
   else if (k == Qt::Key_G)
   { // "G" -> grid On/Off
     bool on = !checkGrid();
     enableGrid(on);
-    emit gridOn(on);
   }
   else if (k == Qt::Key_A)
   { // "A" -> antialiased On/Off
     bool on = !checkAntialiased();
     enableAntialiased(on);
-    emit antialiasedOn(on);
   }
   else if (k == Qt::Key_C)
-  { // "C" -> scroll to center
+  { // "C" -> set cursor to center
     center();
   }
   else if (k == Qt::Key_M)
   { // "M" -> on/off marker
-    if (m == Qt::ControlModifier)
+    if (checkMarker())
     { // off marker
       enableMarker(false);
     }
@@ -867,7 +898,7 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
   }
   else if (k == Qt::Key_V)
   { // "V" -> on/off vLine
-    if (m == Qt::ControlModifier)
+    if (checkVLine())
     { // off vLine
       enableVLine(false);
     }
@@ -880,7 +911,7 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
   }
   else if (k == Qt::Key_H)
   { // "H" -> on/off hLine
-    if (m == Qt::ControlModifier)
+    if (checkHLine())
     { // off hLine
       enableHLine(false);
     }
@@ -898,6 +929,8 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
     else if (k == Qt::Key_Up)    scrollY( d_conf.scrollYStep); // scroll up
     else if (k == Qt::Key_Down)  scrollY(-d_conf.scrollYStep); // scroll down
   }
+
+  event->accept();
 }
 //----------------------------------------------------------------------------
 

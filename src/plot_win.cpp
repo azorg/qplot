@@ -246,12 +246,15 @@ void PlotWin::on_actDemo_triggered()
 //----------------------------------------------------------------------------
 void PlotWin::on_pa_clickOn(double xBottom, double xTop,
                             double yLeft,   double yRight,
-                            Qt::MouseButtons buttons)
+                            Qt::MouseButtons buttons,
+                            Qt::KeyboardModifiers modifiers)
 {
   qDebug("PlotWin::on_pa_clickOn(double xBottom=%g, double xTop=%g,\n"
          "                       double yLeft=%g, double yRight=%g\n"
          "                       buttons=0x%08X)",
          xBottom, xTop, yLeft, yRight, (int) buttons);
+
+  modifiers = modifiers; // FIXME
 
   if (this->demo)
   {

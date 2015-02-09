@@ -205,7 +205,7 @@ signals:
   // координаты курсора по шкалам (по левой кнопке мыши)
   void clickOn(double xBottom, double xTop,
                double yLeft,   double yRight,
-               Qt::MouseButtons buttons);
+               Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers);
 
   void zoomOn(bool on);        // on/off zoom
   void legendOn(bool on);      // on/off legend
@@ -226,6 +226,7 @@ private Q_SLOTS:
 protected:
   void mousePressEvent(QMouseEvent *event);
   void mouseDoubleClickEvent(QMouseEvent *event);
+  void wheelEvent(QWheelEvent *event);
   void keyPressEvent(QKeyEvent *event);
 
 private:
