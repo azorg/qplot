@@ -778,7 +778,7 @@ void PlotArea::mousePressEvent(QMouseEvent *event)
   
   if (modifiers == Qt::ControlModifier && (buttons & Qt::RightButton))
   { // Ctrl + FightButton => reset zoom
-    if (d_picker->isEnabled()) // !checkZoom()
+    if (!checkZoom())
       resetZoom(); // в режиме "zoom on" сочетание перехватывает Qwt
     event->accept();
     return;
@@ -852,8 +852,7 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
 
   if (k == Qt::Key_Z)
   { // "Z" -> zoom On/Off
-    bool on = d_picker->isEnabled(); // !checkZoom();
-    enableZoom(on);
+    enableZoom(!checkZoom());
   }
   else if (k == Qt::Key_R)
   { // "R" -> reset zoom
@@ -861,7 +860,7 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
   }
   else if (k == Qt::Key_Escape)
   { // "ESC" -> reset zoom
-    if(d_picker->isEnabled()) // !checkZoom()
+    if (!checkZoom())
       resetZoom(); // в режиме "zoom on" ESC перехватывает Qwt
   }
   else if (k == Qt::Key_L)

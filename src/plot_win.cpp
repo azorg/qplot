@@ -362,6 +362,9 @@ void PlotWin::on_pa_keyOn(QKeyEvent *event)
   if (k == Qt::Key_F)
     setWindowState(windowState() ^ Qt::WindowFullScreen);
 
+  if (k == Qt::Key_Q)
+    QCoreApplication::exit(0);
+
   event->accept();
 }
 //----------------------------------------------------------------------------
