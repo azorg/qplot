@@ -1,14 +1,12 @@
 /*
- * QPlot - QWT example 2d plotting tool via Qwt
+ * QPlot - 2d plotting tool based on Qwt
  * File: "plot_win.cpp" (main Qt window)
- * Author: Alex Zorg <azorg@mail.ru>
  */
 //----------------------------------------------------------------------------
 //#include <QtGui>
 #include <QMessageBox>
 #include <QDebug>
 //----------------------------------------------------------------------------
-//!!!#include <qwt_scale_engine.h>
 #include "plot_win.h"
 //----------------------------------------------------------------------------
 PlotWin::PlotWin(QWidget *parent) : QMainWindow(parent)

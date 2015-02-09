@@ -1,7 +1,6 @@
 /*
- * QPlot - QWT example 2d plotting tool via Qwt
+ * QPlot - 2d plotting tool based on Qwt
  * File: "plot_win.h" (main Qt window)
- * Author: Alex Zorg <azorg@mail.ru>
  */
 //----------------------------------------------------------------------------
 #ifndef PLOT_WIN_H
@@ -41,6 +40,7 @@ private Q_SLOTS:
                      double yLeft,   double yRight,
                      Qt::MouseButtons buttons);
 
+  //!!! FIXME
   //void on_pa_scaled(double xBottom, double wBottom, // zoomed or scralled
   //                  double yLeft,   double hLeft,
   //                  double xTop,    double wTop,

@@ -1,7 +1,6 @@
 /*
- * Example 2d plotting Qt widget based on Qwt
+ * PlotArea - 2d plotting widget based on Qwt
  * File: "plot_area.cpp"
- * Author: Alex Zorg <azorg@mail.ru>
  */
 //----------------------------------------------------------------------------
 //!!!#include <qprinter.h>
@@ -93,7 +92,6 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
   d_marker = (QwtPlotMarker*) 0;
 
   setConf(d_conf);
-
 
   // выделене с помощью zoom'а
   //!!! FIXME
@@ -765,11 +763,13 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
   key[1] = '\0';
 
   qDebug("PlotArea::keyPressEvent(key='%s%s', code=0x%02X)",
+         
          (m == Qt::ControlModifier) ? "Ctrl+"   :
          (m == Qt::ShiftModifier)   ? "Shift+"  :
          (m == Qt::AltModifier)     ? "Alt+"    :
          (m == Qt::MetaModifier)    ? "Meta+"   :
          (m == Qt::KeypadModifier)  ? "KeyPad+" : "",
+
          (k == Qt::Key_Right)     ? "Right"     :
          (k == Qt::Key_Left)      ? "Left"      :
          (k == Qt::Key_Up)        ? "Up"        :
@@ -782,6 +782,7 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
          (k == Qt::Key_Delete)    ? "Delete"    :
          (k == Qt::Key_Backspace) ? "Backspace" :
          (k >= ' ' && k < 128)    ? key         : "???",
+         
          k);
 
   if (k == Qt::Key_Z)

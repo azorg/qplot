@@ -18,3 +18,6 @@ rm -rf ./_debug/.*
 rm -rf ./_release/*
 rm -rf ./_release/.*
 
+rm -f "$HOME/.qplotrc"
+rm -f "$HOME/qplot.ini"
+
