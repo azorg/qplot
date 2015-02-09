@@ -23,6 +23,7 @@ private Q_SLOTS:
   // главное меню
   void on_actExportImg_triggered();        // File->Export to Image
   void on_actExportSvg_triggered();        // File->Export to SVG
+  void on_actExportPdf_triggered();        // File->Export to PDF
   void on_actExportPrn_triggered();        // File->Print (Export to PDF/PS)
 
   void on_actZoom_toggled(bool on);        // View->Zoom

@@ -685,6 +685,29 @@ void PlotArea::exportSvg(QString fname, bool dialog)
 #endif // QT_SVG_LIB
 }
 //----------------------------------------------------------------------------
+void PlotArea::exportPdf(QString fname, bool dialog)
+{ // экспорт в PDF
+  qDebug("PlotArea::exportPdf()");
+
+#ifndef QT_NO_FILEDIALOG
+  if (dialog)
+    fname = QFileDialog::getSaveFileName(
+              this,
+              tr("Export File Name"),
+              fname,
+              tr("SVG Image (*.pdf)"));
+#endif
+
+  if (!fname.isEmpty())
+  {
+    QSize size = this->size();
+    int h = size.height() * 2 / 7; // FIXME: magic conctsnts
+    int w = size.width()  * 2 / 7; // FIXME: magic constants
+    QwtPlotRenderer renderer;
+    renderer.renderDocument(this, fname, "pdf", QSize(w, h));
+  }
+}
+//----------------------------------------------------------------------------
 void PlotArea::exportPrn(QString docName)
 { // экспорт в PDF/PS или печать
   qDebug("PlotArea::exportPrn()");

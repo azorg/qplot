@@ -195,7 +195,10 @@ public:
   // экспорт в SVG
   void exportSvg(QString fname = "qplot.svg", bool dialog = true);
 
-  // печать или экспорт в PDF/PS
+  // экспорт в PDF
+  void exportPdf(QString fname = "qplot.pdf", bool dialog = true);
+
+  // печать (или экспорт в PDF/PS)
   void exportPrn(QString docName = "qplot");
 
 signals:

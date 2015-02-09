@@ -78,6 +78,14 @@ void PlotWin::on_actExportSvg_triggered()
   ui->pa->exportSvg();
 }
 //----------------------------------------------------------------------------
+void PlotWin::on_actExportPdf_triggered()
+{
+  qDebug("PlotWin::on_actExportPdf_triggered() <- "
+         "File->Export to PDF");
+
+  ui->pa->exportPdf();
+}
+//----------------------------------------------------------------------------
 void PlotWin::on_actExportPrn_triggered()
 {
   qDebug("PlotWin::on_actExportPrn_triggered() <- "

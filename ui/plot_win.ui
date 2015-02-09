@@ -37,7 +37,7 @@
      <x>0</x>
      <y>0</y>
      <width>647</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_file">
@@ -46,6 +46,7 @@
     </property>
     <addaction name="actExportImg"/>
     <addaction name="actExportSvg"/>
+    <addaction name="actExportPdf"/>
     <addaction name="actExportPrn"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -89,6 +90,11 @@
   <action name="actExportSvg">
    <property name="text">
     <string>Export to SVG</string>
+   </property>
+  </action>
+  <action name="actExportPdf">
+   <property name="text">
+    <string>Export to PDF</string>
    </property>
   </action>
   <action name="actExportPrn">
