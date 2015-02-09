@@ -19,6 +19,9 @@ public:
   // вывести сообщение в строку состояния
   void showInfo(QString text = QString::null);
 
+  // демонстрационный вывод графика
+  void demoPlot();
+
 private Q_SLOTS:
   // главное меню
   void on_actExportImg_triggered();        // File->Export to Image
@@ -36,23 +39,26 @@ private Q_SLOTS:
   void on_actAboutQt_triggered();          // Help->About Qt
   void on_actDemo_triggered();             // Help->Demo
 
-  // обработка сигналов от PlotArea
+  // обработчики сигналов от ui->pa (PlotArea)
+  void on_pa_zoomOn(bool on);        // zoom on/off
+  void on_pa_legendOn(bool on);      // legend on/off
+  void on_pa_gridOn(bool on);        // grid on/off
+  void on_pa_antialiasedOn(bool on); // antialiased on/off
+
+  // on mouse click
   void on_pa_clickOn(double xBottom, double xTop, // point by click
                      double yLeft,   double yRight,
                      Qt::MouseButtons buttons,
                      Qt::KeyboardModifiers modifiers);
+
+  // on key pressed
+  void on_pa_keyOn(QKeyEvent *event);
 
   //!!! FIXME
   //void on_pa_scaled(double xBottom, double wBottom, // zoomed or scralled
   //                  double yLeft,   double hLeft,
   //                  double xTop,    double wTop,
   //                  double yRight,  double hRight);
-
-  // обратные вызовы от ui->pa (PlotArea)
-  void on_pa_zoomOn(bool on);        // zoom on/off
-  void on_pa_legendOn(bool on);      // legend on/off
-  void on_pa_gridOn(bool on);        // grid on/off
-  void on_pa_antialiasedOn(bool on); // grid on/off
 
 private:
   bool demo; // true in demo mode

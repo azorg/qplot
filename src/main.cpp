@@ -40,14 +40,17 @@ static void parse_cmd_options(int argc, char **argv)
   while (1)
   {
     int c, option_index = 0;
+
     static struct option long_options[] = {
       // {char *name, int has_arg, int *flag, int val}
       {"config", 1, (int*) NULL, 0},
       {"help",   0, (int*) NULL, 0},
       {(const char*) NULL, 0, (int*) NULL, 0}
     };
-    c = getopt_long (argc, argv, "c:h", long_options, &option_index);
+
+    c = getopt_long(argc, argv, "c:h", long_options, &option_index);
     if (c == -1) break;
+
     if (c == 'c' || (c == 0 && option_index == 0)) // -c or --config option
     {
       ini_file = (char*) optarg;
@@ -92,7 +95,6 @@ int main(int argc, char *argv[])
   w = ini.read_long("PlotWin", "w", w);
   h = ini.read_long("PlotWin", "h", h);
   pw.setGeometry(x, y, w, h);
-  //pw.resize(640, 480); // FIXME
   pw.show();
 
   int retv = app.exec();

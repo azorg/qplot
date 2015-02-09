@@ -207,10 +207,13 @@ signals:
                double yLeft,   double yRight,
                Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers);
 
-  void zoomOn(bool on);        // on/off zoom
-  void legendOn(bool on);      // on/off legend
-  void gridOn(bool on);        // on/off grid
-  void antialiasedOn(bool on); // on/off antialiased
+  void keyOn(QKeyEvent *event); // on key pressed
+
+  void zoomOn(bool on);         // on/off zoom
+  void legendOn(bool on);       // on/off legend
+  void gridOn(bool on);         // on/off grid
+  void antialiasedOn(bool on);  // on/off antialiased
+
 
   // пользователь выполнил zoom или scroll
   //!!! FIXME

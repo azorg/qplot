@@ -930,7 +930,7 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
     else if (k == Qt::Key_Down)  scrollY(-d_conf.scrollYStep); // scroll down
   }
 
-  event->accept();
+  emit keyOn(event);
 }
 //----------------------------------------------------------------------------
 
