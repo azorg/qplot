@@ -9,6 +9,14 @@
 //----------------------------------------------------------------------------
 #include "plot_win.h"
 //----------------------------------------------------------------------------
+// вспомагательная функция для отладочной печати
+static const char *_b2s(bool on)
+{
+  static const char *str_true  = "true";
+  static const char *str_false = "false";
+  return on ? str_true : str_false;
+}
+//----------------------------------------------------------------------------
 PlotWin::PlotWin(QWidget *parent) : QMainWindow(parent)
 {
   qDebug("PlotWin::PlotWin(QWidget *parent=%p)", parent);
@@ -48,7 +56,7 @@ PlotWin::~PlotWin()
 //----------------------------------------------------------------------------
 void PlotWin::showInfo(QString text)
 {
-  qDebug("PlotWin::showInfo(QString text='%s')`",
+  qDebug("PlotWin::showInfo(QString text='%s')",
          text.toLocal8Bit().data());
 
   statusBar()->showMessage(text);
@@ -81,7 +89,7 @@ void PlotWin::on_actExportPrn_triggered()
 void PlotWin::on_actZoom_toggled(bool on)
 {
   qDebug("PlotWin::on_actZoom_toggled(bool on=%s) <- "
-         "View->Zoom", on ? "true" : "false");
+         "View->Zoom", _b2s(on));
 
   ui->pa->enableZoom(on);
 }
@@ -97,7 +105,7 @@ void PlotWin::on_actResetZoom_triggered()
 void PlotWin::on_actLegend_toggled(bool on)
 {
   qDebug("PlotWin::on_actLegend_toggled(bool on=%s) <- "
-         "View->Legend", on ? "true" : "false");
+         "View->Legend", _b2s(on));
 
   ui->pa->enableLegend(on);
 }
@@ -105,7 +113,7 @@ void PlotWin::on_actLegend_toggled(bool on)
 void PlotWin::on_actGrid_toggled(bool on)
 {
   qDebug("PlotWin::on_actGrid_toggled(bool on=%s) <- "
-         "View->Grid", on ? "true" : "false");
+         "View->Grid", _b2s(on));
 
   ui->pa->enableGrid(on);
 }
@@ -113,7 +121,7 @@ void PlotWin::on_actGrid_toggled(bool on)
 void PlotWin::on_actAntialiased_toggled(bool on)
 {
   qDebug("PlotWin::on_actAntialiased_toggled(bool on=%s) <- "
-         "View->Antialiased", on ? "true" : "false");
+         "View->Antialiased", _b2s(on));
 
   ui->pa->enableAntialiased(on);
 }
@@ -166,8 +174,10 @@ void PlotWin::on_actDemo_triggered()
     y[i]  = sin(t * M_PI / 180.) * 10;
   }
 
-  // добавить график "X(t)"
   ui->pa->clear();
+  
+  // добавить график "X(t)"
+  //QwtPlotCurve *X =
   ui->pa->addCurve(
     t,                     // указатель на массив X
     x,                     // указатель на массив Y
@@ -203,17 +213,18 @@ void PlotWin::on_actDemo_triggered()
   delete[] t;
 
   // axes
-  ui->pa->setXYTitle(QwtPlot::xTop,    "fi");
-  ui->pa->setXYTitle(QwtPlot::xBottom, "t");
-  ui->pa->setXYTitle(QwtPlot::yLeft,   "X");
-  ui->pa->setXYTitle(QwtPlot::yRight,  "Y");
-  //ui->pa->disableYLeft();
+  //ui->pa->setXYTitle(QwtPlot::xTop,    "fi");
+  //ui->pa->setXYTitle(QwtPlot::xBottom, "t");
+  //ui->pa->setXYTitle(QwtPlot::yLeft,   "X");
+  //ui->pa->setXYTitle(QwtPlot::yRight,  "Y");
+  ui->pa->enableAxis(QwtPlot::yRight);
+  ui->pa->enableAxis(QwtPlot::xTop);
 
-  // ox: 0...720
+  // ox: 0...720, 0...4*M_PI
   ui->pa->setAxisScale(QwtPlot::xBottom, 0., 720.);
   ui->pa->setAxisScale(QwtPlot::xTop,    0., 4*M_PI);
 
-  // oy: -1...1
+  // oy: -1...1, -10...10
   ui->pa->setAxisScale(QwtPlot::yLeft,  -1., 1.);
   ui->pa->setAxisScale(QwtPlot::yRight, -10., 10.);
 
@@ -262,7 +273,7 @@ void PlotWin::on_pa_scaleOn(double xBottom, double wBottom,
 //----------------------------------------------------------------------------
 void PlotWin::on_pa_zoomOn(bool on)
 {
-  qDebug("PlotWin::on_pa_zoomOn(bool on=%s)", on ? "true" : "false");
+  qDebug("PlotWin::on_pa_zoomOn(bool on=%s)", _b2s(on));
 
   if (ui->actZoom->isChecked() != on)
     ui->actZoom->setChecked(on);
@@ -272,7 +283,7 @@ void PlotWin::on_pa_zoomOn(bool on)
 //----------------------------------------------------------------------------
 void PlotWin::on_pa_legendOn(bool on)
 {
-  qDebug("PlotWin::on_pa_legendOn(bool on=%s)", on ? "true" : "false");
+  qDebug("PlotWin::on_pa_legendOn(bool on=%s)", _b2s(on));
 
   if (ui->actLegend->isChecked() != on)
     ui->actLegend->setChecked(on);
@@ -282,7 +293,7 @@ void PlotWin::on_pa_legendOn(bool on)
 //----------------------------------------------------------------------------
 void PlotWin::on_pa_gridOn(bool on)
 {
-  qDebug("PlotWin::on_pa_gridOn(bool on=%s)", on ? "true" : "false");
+  qDebug("PlotWin::on_pa_gridOn(bool on=%s)", _b2s(on));
 
   if (ui->actGrid->isChecked() != on)
     ui->actGrid->setChecked(on);
@@ -292,7 +303,7 @@ void PlotWin::on_pa_gridOn(bool on)
 //----------------------------------------------------------------------------
 void PlotWin::on_pa_antialiasedOn(bool on)
 {
-  qDebug("PlotWin::on_pa_antialiasedOn(bool on=%s)", on ? "true" : "false");
+  qDebug("PlotWin::on_pa_antialiasedOn(bool on=%s)", _b2s(on));
 
   if (ui->actAntialiased->isChecked() != on)
     ui->actAntialiased->setChecked(on);

@@ -1,7 +1,18 @@
 TARGET = qplot
 TEMPLATE = app
-QT += svg
+
 CONFIG += silent
+#CONFIG += debug
+
+QT += svg
+
+greaterThan(QT_MAJOR_VERSION, 4) {
+  QT += widgets
+  QT += printsupport
+  DEFINES += HAVE_QT5
+}
+
+DEFINES += __STDC_FORMAT_MACROS
 
 #QWT = /usr/local/qwt-svn
 QWT = /usr/local/qwt
@@ -30,8 +41,12 @@ FORMS += \
 
 RESOURCES += 
 
-OBJECTS_DIR = .build/obj
-MOC_DIR     = .build/moc
-RCC_DIR     = .build/rcc
-UI_DIR      = .build/ui
+#CONFIG(debug, debug|release) { DESTDIR = _bin_debug   }
+#else                         { DESTDIR = _bin_release }
+DESTDIR = .
+
+OBJECTS_DIR = $${DESTDIR}/.build/obj
+MOC_DIR     = $${DESTDIR}/.build/moc
+RCC_DIR     = $${DESTDIR}/.build/rcc
+UI_DIR      = $${DESTDIR}/.build/ui
 

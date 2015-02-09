@@ -3,13 +3,14 @@
  * File: "plot_area.cpp"
  */
 //----------------------------------------------------------------------------
-//!!!#include <qprinter.h>
 #include <qpicture.h>
 #include <qpainter.h>
 #include <qfiledialog.h>
-//!!!#include <qprintdialog.h>
+#include <qprinter.h>
+#include <qprintdialog.h>
 #include <qfileinfo.h>
 #include <qwt_picker_machine.h>
+#include <qwt_plot_renderer.h>
 //----------------------------------------------------------------------------
 #include <QKeyEvent>
 //----------------------------------------------------------------------------
@@ -23,6 +24,14 @@
 #if QT_VERSION < 0x040400
 #  error "QT_VERSION < 0x040400"
 #endif
+//----------------------------------------------------------------------------
+// вспомагательная функция для отладочной печати
+static const char *_b2s(bool on)
+{
+  static const char *str_true  = "true";
+  static const char *str_false = "false";
+  return on ? str_true : str_false;
+}
 //----------------------------------------------------------------------------
 class PlotAreaZoomer: public QwtPlotZoomer
 {
@@ -53,9 +62,9 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
   setAutoReplot(false);
 
   //!!! FIXME
-  //const int margin = 5;
-  //this->setContentsMargins( margin, margin, margin, 0 );
-  //setContextMenuPolicy( Qt::NoContextMenu );
+  const int margin = 3;
+  this->setContentsMargins( margin, margin, margin, 0);
+  setContextMenuPolicy( Qt::NoContextMenu );
 
   // zoomer (if zoom on)
   d_zoomer[0] = new PlotAreaZoomer(QwtPlot::xBottom, QwtPlot::yLeft,
@@ -122,6 +131,12 @@ PlotArea::~PlotArea()
   if (checkLegend()) delete d_legend;
 }
 //----------------------------------------------------------------------------
+PlotAreaConf PlotArea::getConf() const
+{
+  qDebug("PlotArea::getConf()");
+  return d_conf;
+}
+//----------------------------------------------------------------------------
 void PlotArea::setConf(const PlotAreaConf &newConf)
 {
   qDebug("PlotArea::setConf()");
@@ -167,7 +182,7 @@ void PlotArea::resetZoom()
 //----------------------------------------------------------------------------
 void PlotArea::enableZoom(bool on)
 {
-  qDebug("PlotArea::enableZoom(bool on=%s)", on ? "true" : "false");
+  qDebug("PlotArea::enableZoom(bool on=%s)", _b2s(on));
 
   d_panner->setEnabled(on);
 
@@ -191,12 +206,11 @@ bool PlotArea::checkZoom() const
 //----------------------------------------------------------------------------
 void PlotArea::enableLegend(bool on)
 {
-  qDebug("PlotArea::enableLegend(bool on=%s)", on ? "true" : "false");
+  qDebug("PlotArea::enableLegend(bool on=%s)", _b2s(on));
 
   if (on && d_legend == (QwtLegend*) 0)
   {
     d_legend = new QwtLegend(this);
-    //d_legend->setItemMode(QwtLegend::CheckableItem);
 
     if (d_conf.legendBox)
       d_legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
@@ -223,15 +237,15 @@ bool PlotArea::checkLegend() const
 //----------------------------------------------------------------------------
 void PlotArea::enableGrid(bool on)
 {
-  qDebug("PlotArea::enableGrid(bool on=%s)", on ? "true" : "false");
+  qDebug("PlotArea::enableGrid(bool on=%s)", _b2s(on));
 
   if (on && d_grid == (QwtPlotGrid*) 0)
   {
     d_grid = new QwtPlotGrid();
     d_grid->enableXMin(d_conf.gridXMin);
     d_grid->enableYMin(d_conf.gridYMin);
-    //!!! FIXME d_grid->setMajPen(d_conf.gridMajPen);
-    //!!! FIXME d_grid->setMinPen(d_conf.gridMinPen);
+    d_grid->setMajorPen(d_conf.gridMajorPen);
+    d_grid->setMinorPen(d_conf.gridMinorPen);
     d_grid->attach(this);
 
     emit gridOn(on);
@@ -254,7 +268,7 @@ bool PlotArea::checkGrid() const
 //----------------------------------------------------------------------------
 void PlotArea::enableVLine(bool on)
 {
-  qDebug("PlotArea::enableVline(bool on=%s)", on ? "true" : "false");
+  qDebug("PlotArea::enableVline(bool on=%s)", _b2s(on));
 
   if (on && d_vLine == (QwtPlotMarker*) 0)
   {
@@ -275,7 +289,7 @@ void PlotArea::enableVLine(bool on)
 void PlotArea::setVLine(double x, bool showText)
 {
   qDebug("PlotArea::setVLine(double x=%g, bool showText=%s)",
-         x, showText ? "true" : "false");
+         x, _b2s(showText));
 
   enableVLine(true);
   d_vLine->setValue(x, 0.);
@@ -301,7 +315,7 @@ bool PlotArea::checkVLine() const
 //----------------------------------------------------------------------------
 void PlotArea::enableHLine(bool on)
 {
-  qDebug("PlotArea::enableHLine(bool on=%s)", on ? "true" : "false");
+  qDebug("PlotArea::enableHLine(bool on=%s)", _b2s(on));
 
   if (on && d_hLine == (QwtPlotMarker*) 0)
   {
@@ -322,7 +336,7 @@ void PlotArea::enableHLine(bool on)
 void PlotArea::setHLine(double y, bool showText)
 {
   qDebug("PlotArea::setHLine(double y=%g, bool showText=%s)",
-         y, showText ? "true" : "false");
+         y, _b2s(showText));
 
   enableHLine(true);
   d_hLine->setValue(0., y);
@@ -348,7 +362,7 @@ bool PlotArea::checkHLine() const
 //----------------------------------------------------------------------------
 void PlotArea::enableMarker(bool on)
 {
-  qDebug("PlotArea::enableMarker(bool on=%s)", on ? "true" : "false");
+  qDebug("PlotArea::enableMarker(bool on=%s)", _b2s(on));
 
   if (on && d_marker == (QwtPlotMarker*) 0)
   {
@@ -373,7 +387,7 @@ void PlotArea::enableMarker(bool on)
 void PlotArea::setMarker(double x, double y, bool showText)
 {
   qDebug("PlotArea::setMarker(double x=%g, double y=%g, bool showText=%s)",
-         x, y, showText ? "true" : "false");
+         x, y, _b2s(showText));
 
   enableMarker(true);
   d_marker->setValue(x, y);
@@ -399,7 +413,7 @@ bool PlotArea::checkMarker() const
 //----------------------------------------------------------------------------
 void PlotArea::enableAntialiased(bool on)
 {
-  qDebug("PlotArea::enableAntialiased(bool on=%s)", on ? "true" : "false");
+  qDebug("PlotArea::enableAntialiased(bool on=%s)", _b2s(on));
 
   bool old = d_conf.antialiased;
   d_conf.antialiased = on;
@@ -429,25 +443,25 @@ void PlotArea::setXYTitle(int axisId, const QString &title)
 //----------------------------------------------------------------------------
 void PlotArea::disableXBottom(bool off)
 {
-  qDebug("PlotArea::disableXBottom(bool off=%s)", off ? "true" : "false");
+  qDebug("PlotArea::disableXBottom(bool off=%s)", _b2s(off));
   enableAxis(QwtPlot::xBottom, !off);
 }
 //----------------------------------------------------------------------------
 void PlotArea::disableXTop(bool off)
 {
-  qDebug("PlotArea::disableXTop(bool off=%s)", off ? "true" : "false");
+  qDebug("PlotArea::disableXTop(bool off=%s)", _b2s(off));
   enableAxis(QwtPlot::xTop, !off);
 }
 //----------------------------------------------------------------------------
 void PlotArea::disableYLeft(bool off)
 {
-  qDebug("PlotArea::disableYLeft(bool off=%s)", off ? "true" : "false");
+  qDebug("PlotArea::disableYLeft(bool off=%s)", _b2s(off));
   enableAxis(QwtPlot::yLeft, !off);
 }
 //----------------------------------------------------------------------------
 void PlotArea::disableYRight(bool off)
 {
-  qDebug("PlotArea::disableYRight(bool off=%s)", off ? "true" : "false");
+  qDebug("PlotArea::disableYRight(bool off=%s)", _b2s(off));
   enableAxis(QwtPlot::yRight, !off);
 }
 //----------------------------------------------------------------------------
@@ -492,8 +506,8 @@ QwtPlotCurve* PlotArea::addCurve(
     curve->setStyle(style);
   }
 
-  //!!! FIXME легенда???
-  curve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
+  //!!! FIXME легенда в форме линии
+  //curve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
 
   // установить цвета/стиль/размер символов
   if (symStyle != QwtSymbol::NoSymbol)
@@ -626,65 +640,62 @@ void PlotArea::getXY(double *xBottom, double *xTop,
   *yRight  = invTransform(QwtPlot::yRight,  pos.y());
 }
 //----------------------------------------------------------------------------
-void PlotArea::exportImg(QString fname)
+void PlotArea::exportImg(QString fname, bool dialog)
 { // экспорт в PNG/BMP
   qDebug("PlotArea::exportImg()");
 
 #ifndef QT_NO_FILEDIALOG
-  fname = QFileDialog::getSaveFileName(
-            this,
-            tr("Export File Name"),
-            fname,
-            tr("Image (*.png;*.bmp;*.tiff;*.jpg)"));
+  if (dialog)
+    fname = QFileDialog::getSaveFileName(
+              this,
+              tr("Export File Name"),
+              fname,
+              tr("Image (*.png;*.bmp;*.tiff;*.jpg)"));
 #endif
 
   if (!fname.isEmpty())
   {
-    //fname = QFileInfo(fname).absolutePath();
     QPixmap pix = QPixmap::grabWidget(this);
     pix.save(fname);
   }
 }
 //----------------------------------------------------------------------------
-void PlotArea::exportSvg(QString fname)
+void PlotArea::exportSvg(QString fname, bool dialog)
 { // экспорт в SVG
   qDebug("PlotArea::exportSvg()");
 
 #ifdef QT_SVG_LIB
 #  ifndef QT_NO_FILEDIALOG
-  fname = QFileDialog::getSaveFileName(
-      this,
-      tr("Export File Name"),
-      fname,
-      tr("SVG Image (*.svg)"));
+  if (dialog)
+    fname = QFileDialog::getSaveFileName(
+              this,
+              tr("Export File Name"),
+              fname,
+              tr("SVG Image (*.svg)"));
 #  endif
 
   if (!fname.isEmpty())
   {
-    QSvgGenerator generator;
-    generator.setFileName(fname);
-    generator.setSize(QSize(800, 600)); // FIXME
-    //!!! FIXME
-    ///print(generator);
+    QSize size = this->size();
+    int h = size.height() * 2 / 7; // FIXME: magic conctsnts
+    int w = size.width()  * 2 / 7; // FIXME: magic constants
+    QwtPlotRenderer renderer;
+    renderer.renderDocument(this, fname, "svg", QSize(w, h));
   }
 #endif // QT_SVG_LIB
 }
 //----------------------------------------------------------------------------
-void PlotArea::exportPrn(QString name)
+void PlotArea::exportPrn(QString docName)
 { // экспорт в PDF/PS или печать
   qDebug("PlotArea::exportPrn()");
 
-  //!!! FIXME
-  name = name;
+#ifndef QT_NO_PRINTER
+  QPrinter printer(QPrinter::HighResolution);
 
-//#ifndef QT_NO_PRINTER
-#if 0 //!!! FIXME
-  QPrinter printer;
-
-  if (!name.isEmpty())
+  if (!docName.isEmpty())
   {
-    name.replace(QRegExp (QString::fromLatin1("\n")), tr(" -- "));
-    printer.setDocName(name);
+    docName.replace(QRegExp(QString::fromLatin1("\n")), tr(" -- "));
+    printer.setDocName(docName);
   }
 
   printer.setCreator("QPlot");
@@ -693,17 +704,19 @@ void PlotArea::exportPrn(QString name)
   QPrintDialog dialog(&printer);
   if (dialog.exec())
   {
-    QwtPlotPrintFilter filter;
+    QwtPlotRenderer renderer;
+
     if (printer.colorMode() == QPrinter::GrayScale)
     {
-      int options =  QwtPlotPrintFilter::PrintAll;
-      options    &= ~QwtPlotPrintFilter::PrintBackground;
-      options    |=  QwtPlotPrintFilter::PrintFrameWithScales;
-      filter.setOptions(options);
+      renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground);
+      renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground);
+      renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasFrame);
+      renderer.setLayoutFlag (QwtPlotRenderer::FrameWithScales);
     }
-    print(printer, filter);
+
+    renderer.renderTo(this, printer);
   }
-#endif
+#endif // !QT_NO_PRINTER
 }
 //----------------------------------------------------------------------------
 #if 0 //!!! FIXME

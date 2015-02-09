@@ -1,5 +1,5 @@
-_debug/*
-_release/*
+_bin_debug
+_bin_release
 .build
 .git
 .dep
@@ -9,4 +9,10 @@ _release/*
 Makefile
 qplot
 qplot.exe
+qplot.svg
+qplot.ps
+qplot.pdf
+qplot.png
+qplot.jpg
+
 

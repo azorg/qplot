@@ -29,11 +29,11 @@ public:
     legend          = false;                // легенда выкл.
     legendBox       = false;                // легенда без рамки
     legendPosition  = QwtPlot::RightLegend; // легенда справа
-    grid            = false;                // сетка выкл.
+    grid            = true;                 // сетка выкл.
     gridXMin        = true;                 // мелкая сетка по X
     gridYMin        = true;                 // мелкая сетка по Y
-    gridMajPen      = QPen(Qt::darkGray, 0, Qt::DashLine);
-    gridMinPen      = QPen(Qt::gray,     0, Qt::DotLine);
+    gridMajorPen    = QPen(Qt::darkGray, 0, Qt::DashLine);
+    gridMinorPen    = QPen(Qt::gray,     0, Qt::DotLine);
     antialiased     = false;                // сглаживание откл.
     pickerPen       = QPen(Qt::darkMagenta, 0, Qt::SolidLine);
     pickerAlwaysOn  = false;                // координаты курсора всегда
@@ -44,16 +44,16 @@ public:
     scrollYStep     = 2.;                   // шаг сдвига по Y 2%
     vLinePen        = QPen(Qt::blue, 0, Qt::DashDotLine);
     vLineTextColor  = Qt::blue;
-    vLineFont       = QFont("Helvetica", 10, QFont::Bold);
+    vLineFont       = QFont("Helvetica", 9, QFont::Bold);
     hLinePen        = QPen(Qt::blue, 0, Qt::DashDotLine);
     hLineTextColor  = Qt::blue;
-    hLineFont       = QFont("Helvetica", 10, QFont::Bold);
+    hLineFont       = QFont("Helvetica", 9, QFont::Bold);
     markerStyle     = QwtSymbol::Diamond;
     markerBrush     = QColor(Qt::yellow);
     markerPen       = QColor(Qt::blue);
     markerSize      = 10;
     markerTextColor = Qt::blue;
-    markerFont      = QFont("Helvetica", 10, QFont::Bold);
+    markerFont      = QFont("Helvetica", 9, QFont::Bold);
   }
 
   QColor background;                      // цвет фона
@@ -65,8 +65,8 @@ public:
   bool grid;                              // отображать сетку
   bool gridXMin;                          // мелкая сетка по X
   bool gridYMin;                          // мелкая сетка по Y
-  QPen gridMajPen;                        // тип сетки
-  QPen gridMinPen;                        // тип мелкой сетки
+  QPen gridMajorPen;                      // тип сетки
+  QPen gridMinorPen;                      // тип мелкой сетки
   bool antialiased;                       // сглаживание (тормозит!)
   QPen pickerPen;                         // тип линий указания
   bool pickerAlwaysOn;                    // показывать координаты курсора
@@ -115,7 +115,7 @@ public:
   //void setAxis...
 
   // вернуть текущую конфигурацию (цвета, типы линий, опции отображения)
-  PlotAreaConf getConf() const { return d_conf; }
+  PlotAreaConf getConf() const;
 
   // установить конфигурацию (цвета, типы линий, опции отображения)
   void setConf(const PlotAreaConf &conf);
@@ -189,9 +189,14 @@ public:
   void getXY(double *xBottom, double *xTop,    // сообщить координаты курсора
              double *yLeft,   double *yRight); // по 4-м шкалам
 
-  void exportImg(QString fname = "qplot.png"); // экспорт в PNG/BMP
-  void exportSvg(QString fname = "qplot.svg"); // экспорт в SVG
-  void exportPrn(QString name  = "qplot");     // экспорт в PDF/PS или печать
+  // экспорт в PNG/BMP
+  void exportImg(QString fname = "qplot.png", bool dialog = true);
+
+  // экспорт в SVG
+  void exportSvg(QString fname = "qplot.svg", bool dialog = true);
+
+  // печать или экспорт в PDF/PS
+  void exportPrn(QString docName = "qplot");
 
 signals:
   // координаты курсора по шкалам (по левой кнопке мыши)
