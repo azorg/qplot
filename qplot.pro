@@ -4,6 +4,9 @@ TEMPLATE = app
 CONFIG += silent
 CONFIG += debug
 
+DEFINES += QT_NO_DEBUG_OUTPUT
+DEFINES += __STDC_FORMAT_MACROS
+
 QT += svg
 
 greaterThan(QT_MAJOR_VERSION, 4) {
@@ -11,8 +14,6 @@ greaterThan(QT_MAJOR_VERSION, 4) {
   QT += printsupport
   DEFINES += HAVE_QT5
 }
-
-DEFINES += __STDC_FORMAT_MACROS
 
 #QWT = /usr/local/qwt-svn
 QWT = /usr/local/qwt
