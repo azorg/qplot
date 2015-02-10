@@ -2,7 +2,7 @@ TARGET = qplot
 TEMPLATE = app
 
 CONFIG += silent
-#CONFIG += debug
+CONFIG += debug
 
 QT += svg
 
@@ -30,11 +30,13 @@ SOURCES += \
   libs/clib/ini.c \
   src/plot_area.cpp \
   src/plot_win.cpp \
+  src/core.cpp \
   src/main.cpp
 
 HEADERS += \
   src/plot_area.h \
-  src/plot_win.h
+  src/plot_win.h \
+  src/core.h
 
 FORMS += \
   ui/plot_win.ui

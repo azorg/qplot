@@ -64,9 +64,9 @@ void PlotWin::demoPlot()
 
   //!!!
   // set picker always on
-  //PlotAreaConf conf = ui->pa->getConf();
-  //conf.pickerAlwaysOn = true;
-  //ui->pa->setConf(conf);
+  PlotAreaConf conf = ui->pa->getConf();
+  conf.pickerAlwaysOn = true;
+  ui->pa->setConf(conf);
 
   // create curves data
   int N = 1000; // !!!
@@ -148,6 +148,7 @@ void PlotWin::demoPlot()
   ui->pa->setMarker(200., 0.5);
 
   //ui->pa->redraw();
+  //ui->pa->replot();
 }
 //----------------------------------------------------------------------------
 void PlotWin::on_actExportImg_triggered()

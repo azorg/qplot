@@ -103,6 +103,10 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
 
   setConf(d_conf);
 
+  // положение курсора мыши
+  d_pos = QPoint(0, 0);
+  setMouseTracking(true); //!!!
+
   // выделене с помощью zoom'а
   //!!! FIXME
   //connect(zoomer[0], SIGNAL(zoomed(const QwtDoubleRect &)),
@@ -571,7 +575,7 @@ void PlotArea::redraw()
   d_zoomer[0]->setZoomBase();
   d_zoomer[1]->setZoomBase();
   updateLayout();
-  replot();
+  //replot();
 }
 //----------------------------------------------------------------------------
 void PlotArea::scrollX(double xStep)
@@ -635,18 +639,17 @@ void PlotArea::center()
 void PlotArea::getXY(double *xBottom, double *xTop,
                      double *yLeft,   double *yRight)
 {
-  QPoint pos;
   if (d_picker->isEnabled())
-    pos = d_picker->trackerPosition();
+    d_pos = d_picker->trackerPosition();
   else
-    pos = d_zoomer[0]->trackerPosition();
+    d_pos = d_zoomer[0]->trackerPosition();
   
-  qDebug("PlotArea::getXY(): pos.x()=%i, pos.y()=%i", pos.x(), pos.y());
+  qDebug("PlotArea::getXY(): pos.x()=%i, pos.y()=%i", d_pos.x(), d_pos.y());
 
-  *xBottom = invTransform(QwtPlot::xBottom, pos.x());
-  *xTop    = invTransform(QwtPlot::xTop,    pos.x());
-  *yLeft   = invTransform(QwtPlot::yLeft,   pos.y());
-  *yRight  = invTransform(QwtPlot::yRight,  pos.y());
+  *xBottom = invTransform(QwtPlot::xBottom, d_pos.x());
+  *xTop    = invTransform(QwtPlot::xTop,    d_pos.x());
+  *yLeft   = invTransform(QwtPlot::yLeft,   d_pos.y());
+  *yRight  = invTransform(QwtPlot::yRight,  d_pos.y());
 }
 //----------------------------------------------------------------------------
 void PlotArea::exportImg(QString fname, bool dialog)
@@ -775,8 +778,17 @@ void PlotArea::zoomed(const QwtDoubleRect &)
 }
 #endif
 //----------------------------------------------------------------------------
+void PlotArea::mouseMoveEvent(QMouseEvent *event)
+{ //!!! FIXME
+  QPoint pos = event->pos();
+  qDebug("PlotArea::widgetMouseMoveEvent(): x=%i, y=%i",
+         pos.x(), pos.y());
+}
+//----------------------------------------------------------------------------
 void PlotArea::mousePressEvent(QMouseEvent *event)
 {
+  //!!! FIXME
+  //d_pos = event->pos();
   Qt::MouseButtons buttons = event->buttons();
   Qt::KeyboardModifiers modifiers = event->modifiers();
 
