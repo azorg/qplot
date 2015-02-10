@@ -55,6 +55,37 @@ public:
   }
 };
 //----------------------------------------------------------------------------
+class PlotAreaTracker: public QObject
+{
+public:
+  PlotAreaTracker(QWidget *parent) : QObject(parent)
+  {
+    if (parent)
+    {
+      parent->installEventFilter(this);
+      parent->setMouseTracking(true);
+    }
+    d_pos = QPoint(0, 0);
+  }
+
+  virtual bool eventFilter(QObject *object, QEvent *event)
+  {
+    if (object && object == parent())
+      if (event->type() == QEvent::MouseMove)
+      {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+        d_pos = mouseEvent->pos();
+        //qDebug(">>> MouseMoveEvent: x=%i, y=%i", d_pos.x(), d_pos.y());
+      }
+    return false;
+  }
+
+  QPoint position() const { return d_pos; }
+
+private:
+  QPoint d_pos;
+};
+//----------------------------------------------------------------------------
 PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
 {
   qDebug("PlotArea::PlotArea(QWidget *parent=%p)", parent);
@@ -65,6 +96,9 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
   const int margin = 3;
   this->setContentsMargins( margin, margin, margin, 0);
   setContextMenuPolicy( Qt::NoContextMenu );
+
+  // tracker
+  d_tracker = new PlotAreaTracker(this->canvas());
 
   // zoomer (if zoom off)
   d_zoomer[0] = new PlotAreaZoomer(QwtPlot::xBottom, QwtPlot::yLeft,
@@ -103,10 +137,6 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
 
   setConf(d_conf);
 
-  // положение курсора мыши
-  d_pos = QPoint(0, 0);
-  setMouseTracking(true); //!!!
-
   // выделене с помощью zoom'а
   //!!! FIXME
   //connect(zoomer[0], SIGNAL(zoomed(const QwtDoubleRect &)),
@@ -130,6 +160,7 @@ PlotArea::~PlotArea()
   delete d_panner;
   delete d_zoomer[1];
   delete d_zoomer[0];
+  delete d_tracker;
 }
 //----------------------------------------------------------------------------
 PlotAreaConf PlotArea::getConf() const
@@ -639,17 +670,13 @@ void PlotArea::center()
 void PlotArea::getXY(double *xBottom, double *xTop,
                      double *yLeft,   double *yRight)
 {
-  if (d_picker->isEnabled())
-    d_pos = d_picker->trackerPosition();
-  else
-    d_pos = d_zoomer[0]->trackerPosition();
-  
-  qDebug("PlotArea::getXY(): pos.x()=%i, pos.y()=%i", d_pos.x(), d_pos.y());
+  QPoint pos = d_tracker->position();
+  qDebug("PlotArea::getXY(): pos.x()=%i, pos.y()=%i", pos.x(), pos.y());
 
-  *xBottom = invTransform(QwtPlot::xBottom, d_pos.x());
-  *xTop    = invTransform(QwtPlot::xTop,    d_pos.x());
-  *yLeft   = invTransform(QwtPlot::yLeft,   d_pos.y());
-  *yRight  = invTransform(QwtPlot::yRight,  d_pos.y());
+  *xBottom = invTransform(QwtPlot::xBottom, pos.x());
+  *xTop    = invTransform(QwtPlot::xTop,    pos.x());
+  *yLeft   = invTransform(QwtPlot::yLeft,   pos.y());
+  *yRight  = invTransform(QwtPlot::yRight,  pos.y());
 }
 //----------------------------------------------------------------------------
 void PlotArea::exportImg(QString fname, bool dialog)
@@ -778,17 +805,8 @@ void PlotArea::zoomed(const QwtDoubleRect &)
 }
 #endif
 //----------------------------------------------------------------------------
-void PlotArea::mouseMoveEvent(QMouseEvent *event)
-{ //!!! FIXME
-  QPoint pos = event->pos();
-  qDebug("PlotArea::widgetMouseMoveEvent(): x=%i, y=%i",
-         pos.x(), pos.y());
-}
-//----------------------------------------------------------------------------
 void PlotArea::mousePressEvent(QMouseEvent *event)
 {
-  //!!! FIXME
-  //d_pos = event->pos();
   Qt::MouseButtons buttons = event->buttons();
   Qt::KeyboardModifiers modifiers = event->modifiers();
 

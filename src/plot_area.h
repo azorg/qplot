@@ -90,6 +90,7 @@ public:
 };
 //----------------------------------------------------------------------------
 class PlotAreaZoomer;
+class PlotAreaTracker;
 //----------------------------------------------------------------------------
 // наследик QwtPlot с рядом типичных и дополнительных свойств и методов
 class PlotArea : public QwtPlot
@@ -227,7 +228,6 @@ private Q_SLOTS:
   //void zoomed(const QwtDoubleRect &rect); // совершен zoom
 
 protected:
-  void mouseMoveEvent(QMouseEvent *event);
   void mousePressEvent(QMouseEvent *event);
   void mouseDoubleClickEvent(QMouseEvent *event);
   void wheelEvent(QWheelEvent *event);
@@ -236,6 +236,7 @@ protected:
 private:
   PlotAreaConf d_conf; // конфигурация
 
+  PlotAreaTracker  *d_tracker;   // указатель координат курсора мыши
   PlotAreaZoomer   *d_zoomer[2]; // zoom'ы (0 - по левой шкале, 1 - по правой)
   QwtPlotPicker    *d_picker;    // сборщик (отображение координат курсора)
   QwtPlotPanner    *d_panner;    // "таскатель" в zoom'е
@@ -248,11 +249,8 @@ private:
   QwtPlotMarker *d_marker; // маркер (жирная точка)
 
   QList<QwtPlotCurve*> d_crv; // список отображаемых кривых
-
-  QPoint d_pos; // положение курсора мыши
 };
 //----------------------------------------------------------------------------
 #endif // PLOT_AREA_H
 
 /*** end of "plot_area.h" file ***/
-

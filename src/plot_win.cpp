@@ -64,9 +64,9 @@ void PlotWin::demoPlot()
 
   //!!!
   // set picker always on
-  PlotAreaConf conf = ui->pa->getConf();
-  conf.pickerAlwaysOn = true;
-  ui->pa->setConf(conf);
+  //PlotAreaConf conf = ui->pa->getConf();
+  //conf.pickerAlwaysOn = true;
+  //ui->pa->setConf(conf);
 
   // create curves data
   int N = 1000; // !!!
