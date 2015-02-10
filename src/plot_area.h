@@ -40,20 +40,20 @@ public:
     trackerPen      = QColor(Qt::darkBlue);
     trackerXAxis    = QwtPlot::xBottom;     // нижняя ось X
     trackerYAxis    = QwtPlot::yLeft;       // левая ось Y
-    scrollXStep     = 2.;                   // шаг сдвига по X 2%
-    scrollYStep     = 2.;                   // шаг сдвига по Y 2%
+    scrollXStep     = 2.;                   // шаг сдвига/прокрутки по X 2%
+    scrollYStep     = 2.;                   // шаг сдвига/прокрутки по Y 2%
     vLinePen        = QPen(Qt::blue, 0, Qt::DashDotLine);
     vLineTextColor  = Qt::blue;
-    vLineFont       = QFont("Helvetica", 9, QFont::Bold);
+    vLineFont       = QFont("Helvetica", 10, QFont::Bold);
     hLinePen        = QPen(Qt::blue, 0, Qt::DashDotLine);
     hLineTextColor  = Qt::blue;
-    hLineFont       = QFont("Helvetica", 9, QFont::Bold);
+    hLineFont       = QFont("Helvetica", 10, QFont::Bold);
     markerStyle     = QwtSymbol::Diamond;
     markerBrush     = QColor(Qt::yellow);
     markerPen       = QColor(Qt::blue);
     markerSize      = 10;
     markerTextColor = Qt::blue;
-    markerFont      = QFont("Helvetica", 9, QFont::Bold);
+    markerFont      = QFont("Helvetica", 10, QFont::Bold);
   }
 
   QColor background;                      // цвет фона
@@ -150,12 +150,12 @@ public:
   void setXYTitle(int axisId, const QString &title);
 
   // отключение осей (по умолчанию QwtPlot включает yLeft и xBottom)
-  void disableXBottom(bool off = true); // выкл. нижнюю ось X
-  void disableXTop   (bool off = true); // выкл. верхноюю ось X
-  void disableYLeft  (bool off = true); // выкл. левую ось Y
-  void disableYRight (bool off = true); // выкл. правую ось Y
+  void enableXBottom(bool on = true);  // вкл. нижнюю ось X
+  void enableXTop   (bool on = false); // вкл. верхноюю ось X
+  void enableYLeft  (bool on = true);  // вкл. левую ось Y
+  void enableYRight (bool on = false); // вкл. правую ось Y
 
-  void clear();  // удалить все графики
+  void clear(); // удалить все графики
 
   // добавить график
   QwtPlotCurve *addCurve(

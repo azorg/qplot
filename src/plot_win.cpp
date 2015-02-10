@@ -39,11 +39,6 @@ PlotWin::PlotWin(QWidget *parent) : QMainWindow(parent)
   if (ui->actGrid->isChecked() != on)
       ui->actGrid->setChecked(on);
 
-  // set picker always on
-  PlotAreaConf conf = ui->pa->getConf();
-  conf.pickerAlwaysOn = true;
-  ui->pa->setConf(conf);
-
   //showInfo(tr("Select Help->demo in main menu"));
   demoPlot(); //!!!
   ui->pa->redraw();
@@ -66,6 +61,12 @@ void PlotWin::showInfo(QString text)
 void PlotWin::demoPlot()
 {
   this->demo = true;
+
+  //!!!
+  // set picker always on
+  //PlotAreaConf conf = ui->pa->getConf();
+  //conf.pickerAlwaysOn = true;
+  //ui->pa->setConf(conf);
 
   // create curves data
   int N = 1000; // !!!
@@ -108,7 +109,7 @@ void PlotWin::demoPlot()
     y,                      // указатель на массив Y
     n,                      // число точек (X, Y)
     "Y(fi)",                // имя графика
-    QPen(Qt::green, 2),     // цвет/тип
+    QPen(Qt::green, 1.5),   // цвет/тип
     QwtPlot::xTop,          // ось X
     QwtPlot::yRight,        // ось Y
     QwtPlotCurve::Lines,    // тип кривой
@@ -130,8 +131,8 @@ void PlotWin::demoPlot()
   //ui->pa->setXYTitle(QwtPlot::xBottom, "t");
   //ui->pa->setXYTitle(QwtPlot::yLeft,   "X");
   //ui->pa->setXYTitle(QwtPlot::yRight,  "Y");
-  ui->pa->enableAxis(QwtPlot::yRight);
-  ui->pa->enableAxis(QwtPlot::xTop);
+  ui->pa->enableXTop(true);   // ui->pa->enableAxis(QwtPlot::xTop);
+  ui->pa->enableYRight(true); // ui->pa->enableAxis(QwtPlot::yRight);
 
   // ox: 0...720, 0...4*M_PI
   ui->pa->setAxisScale(QwtPlot::xBottom, 0., 720.);
@@ -146,7 +147,7 @@ void PlotWin::demoPlot()
   ui->pa->setHLine(-0.5);
   ui->pa->setMarker(200., 0.5);
 
-  ui->pa->redraw();
+  //ui->pa->redraw();
 }
 //----------------------------------------------------------------------------
 void PlotWin::on_actExportImg_triggered()

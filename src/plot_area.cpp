@@ -45,13 +45,13 @@ public:
     // отключить прямоугольник выделения
     setRubberBand(QwtPicker::NoRubberBand);
 
-    // Shift+RightButton: zoom out by 1
+    // RightButton: zoom back out by 1
     setMousePattern(QwtEventPattern::MouseSelect3,
-                    Qt::RightButton, Qt::ShiftModifier);
+                    Qt::RightButton, Qt::NoModifier);
 
-    // Ctrl+RightButton: zoom out to full size
+    // Shift+RightButton: zoom out to full size
     setMousePattern(QwtEventPattern::MouseSelect2,
-                    Qt::RightButton, Qt::ControlModifier);
+                    Qt::RightButton, Qt::ShiftModifier);
   }
 };
 //----------------------------------------------------------------------------
@@ -66,13 +66,12 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
   this->setContentsMargins( margin, margin, margin, 0);
   setContextMenuPolicy( Qt::NoContextMenu );
 
-  // zoomer (if zoom on)
+  // zoomer (if zoom off)
   d_zoomer[0] = new PlotAreaZoomer(QwtPlot::xBottom, QwtPlot::yLeft,
                                    this->canvas());
   d_zoomer[0]->setRubberBand(QwtPicker::RectRubberBand);
   //d_zoomer[0]->setRubberBandPen(QColor(Qt::green)); // set in setConf()
   d_zoomer[0]->setTrackerMode(QwtPicker::ActiveOnly);
-
   d_zoomer[1] = new PlotAreaZoomer(QwtPlot::xBottom, QwtPlot::yLeft,
                                    this->canvas());
 
@@ -80,10 +79,10 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
   d_panner = new QwtPlotPanner(this->canvas());
   d_panner->setMouseButton(Qt::MidButton);
 
-  // picker (if zoom off)
+  // picker (if zoom on)
   d_picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
                                QwtPlotPicker::CrossRubberBand,
-                               QwtPicker::ActiveOnly,
+                               QwtPicker::ActiveOnly, // set in setConf()
                                this->canvas());
   d_picker->setStateMachine(new QwtPickerDragPointMachine());
   //d_picker->setRubberBandPen(QColor(Qt::green)); // set in setConf()
@@ -92,6 +91,7 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
 
   // magnifier
   d_magnifier = new QwtPlotMagnifier(this->canvas());
+  d_magnifier->setMouseButton(Qt::RightButton, Qt::ControlModifier);
   d_magnifier->setWheelModifiers(Qt::ControlModifier); // zoom with Control
 
   // установки по-умолчанию
@@ -107,10 +107,6 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
   //!!! FIXME
   //connect(zoomer[0], SIGNAL(zoomed(const QwtDoubleRect &)),
   //                     SLOT(zoomed(const QwtDoubleRect &)));
-
-  // finish
-  setAutoReplot(true);
-  replot();
 }
 //----------------------------------------------------------------------------
 PlotArea::~PlotArea()
@@ -119,17 +115,17 @@ PlotArea::~PlotArea()
 
   clear();
   
-  delete d_magnifier;
-  delete d_panner;
-  delete d_zoomer[1];
-  delete d_zoomer[0];
-  delete d_picker;
-
   if (checkVLine())  delete d_vLine;
   if (checkHLine())  delete d_hLine;
   if (checkMarker()) delete d_marker;
   if (checkGrid())   delete d_grid;
   if (checkLegend()) delete d_legend;
+
+  delete d_magnifier;
+  delete d_picker;
+  delete d_panner;
+  delete d_zoomer[1];
+  delete d_zoomer[0];
 }
 //----------------------------------------------------------------------------
 PlotAreaConf PlotArea::getConf() const
@@ -168,9 +164,15 @@ void PlotArea::setConf(const PlotAreaConf &newConf)
   d_picker->setAxis(d_conf.trackerXAxis,
                     d_conf.trackerYAxis);
   if (d_conf.pickerAlwaysOn)
-    d_picker->setTrackerMode(QwtPicker::AlwaysOn);
+  {
+     d_zoomer[0]->setTrackerMode(QwtPicker::AlwaysOn);
+     d_picker->setTrackerMode(QwtPicker::AlwaysOn);
+  }
   else
+  {
+    d_zoomer[0]->setTrackerMode(QwtPicker::ActiveOnly);
     d_picker->setTrackerMode(QwtPicker::ActiveOnly);
+  }
 }
 //----------------------------------------------------------------------------
 void PlotArea::resetZoom()
@@ -179,6 +181,8 @@ void PlotArea::resetZoom()
 
   d_zoomer[0]->zoom(0);
   d_zoomer[1]->zoom(0);
+
+  replot();
 }
 //----------------------------------------------------------------------------
 void PlotArea::enableZoom(bool on)
@@ -186,15 +190,16 @@ void PlotArea::enableZoom(bool on)
   qDebug("PlotArea::enableZoom(bool on=%s)", _b2s(on));
 
   d_zoomer[0]->setEnabled(on);
-  d_zoomer[0]->zoom(0);
   d_zoomer[1]->setEnabled(on);
-  d_zoomer[1]->zoom(0);
 
   bool old = !d_picker->isEnabled();
   d_picker->setEnabled(!on);
 
   if (on != old)
+  {
+    replot();
     emit zoomOn(on);
+  }
 }
 //----------------------------------------------------------------------------
 bool PlotArea::checkZoom() const
@@ -216,6 +221,7 @@ void PlotArea::enableLegend(bool on)
 
     insertLegend(d_legend, d_conf.legendPosition);
 
+    replot();
     emit legendOn(true);
   }
   else if (!on && d_legend != (QwtLegend*) 0)
@@ -224,6 +230,7 @@ void PlotArea::enableLegend(bool on)
     d_legend = (QwtLegend*) 0;
     updateLayout();
 
+    replot();
     emit legendOn(false);
   }
 }
@@ -247,14 +254,15 @@ void PlotArea::enableGrid(bool on)
     d_grid->setMinorPen(d_conf.gridMinorPen);
     d_grid->attach(this);
 
+    replot();
     emit gridOn(on);
   }
   else if (!on && d_grid != (QwtPlotGrid*) 0)
   {
     delete d_grid;
     d_grid = (QwtPlotGrid*) 0;
-    replot();
 
+    replot();
     emit gridOn(false);
   }
 }
@@ -276,6 +284,7 @@ void PlotArea::enableVLine(bool on)
     d_vLine->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
     d_vLine->setLinePen(d_conf.vLinePen);
     d_vLine->attach(this);
+    replot();
   }
   else if (!on && d_vLine != (QwtPlotMarker*) 0)
   {
@@ -323,6 +332,7 @@ void PlotArea::enableHLine(bool on)
     d_hLine->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
     d_hLine->setLinePen(d_conf.hLinePen);
     d_hLine->attach(this);
+    replot();
   }
   else if (!on && d_hLine != (QwtPlotMarker*) 0)
   {
@@ -374,6 +384,7 @@ void PlotArea::enableMarker(bool on)
                                       QSize(d_conf.markerSize,
                                             d_conf.markerSize)));
     d_marker->attach(this);
+    replot();
   }
   else if (!on && d_marker != (QwtPlotMarker*) 0)
   {
@@ -400,8 +411,6 @@ void PlotArea::setMarker(double x, double y, bool showText)
     text.setFont(d_conf.markerFont);
     d_marker->setLabel(text);
   }
-
-  replot();
 }
 //----------------------------------------------------------------------------
 bool PlotArea::checkMarker() const
@@ -420,10 +429,11 @@ void PlotArea::enableAntialiased(bool on)
   foreach (QwtPlotCurve *curve, d_crv)
     curve->setRenderHint(QwtPlotItem::RenderAntialiased, on);
 
-  replot();
-
   if (on != old)
+  {
+    replot();
     emit antialiasedOn(on);
+  }
 }
 //----------------------------------------------------------------------------
 bool PlotArea::checkAntialiased() const
@@ -438,30 +448,35 @@ void PlotArea::setXYTitle(int axisId, const QString &title)
 
   enableAxis  (axisId);
   setAxisTitle(axisId, title);
+  replot();
 }
 //----------------------------------------------------------------------------
-void PlotArea::disableXBottom(bool off)
+void PlotArea::enableXBottom(bool on)
 {
-  qDebug("PlotArea::disableXBottom(bool off=%s)", _b2s(off));
-  enableAxis(QwtPlot::xBottom, !off);
+  qDebug("PlotArea::enableXBottom(bool on=%s)", _b2s(on));
+  enableAxis(QwtPlot::xBottom, on);
+  replot();
 }
 //----------------------------------------------------------------------------
-void PlotArea::disableXTop(bool off)
+void PlotArea::enableXTop(bool on)
 {
-  qDebug("PlotArea::disableXTop(bool off=%s)", _b2s(off));
-  enableAxis(QwtPlot::xTop, !off);
+  qDebug("PlotArea::enableXTop(bool on=%s)", _b2s(on));
+  enableAxis(QwtPlot::xTop, on);
+  replot();
 }
 //----------------------------------------------------------------------------
-void PlotArea::disableYLeft(bool off)
+void PlotArea::enableYLeft(bool on)
 {
-  qDebug("PlotArea::disableYLeft(bool off=%s)", _b2s(off));
-  enableAxis(QwtPlot::yLeft, !off);
+  qDebug("PlotArea::enableYLeft(bool on=%s)", _b2s(on));
+  enableAxis(QwtPlot::yLeft, on);
+  replot();
 }
 //----------------------------------------------------------------------------
-void PlotArea::disableYRight(bool off)
+void PlotArea::enableYRight(bool on)
 {
-  qDebug("PlotArea::disableYRight(bool off=%s)", _b2s(off));
-  enableAxis(QwtPlot::yRight, !off);
+  qDebug("PlotArea::enableYRight(bool on=%s)", _b2s(on));
+  enableAxis(QwtPlot::yRight, on);
+  replot();
 }
 //----------------------------------------------------------------------------
 void PlotArea::clear()
@@ -472,6 +487,7 @@ void PlotArea::clear()
     delete curve;
 
   d_crv.clear();
+  replot();
 }
 //----------------------------------------------------------------------------
 QwtPlotCurve* PlotArea::addCurve(
@@ -532,6 +548,7 @@ QwtPlotCurve* PlotArea::addCurve(
   // привязать к QwtPlot
   curve->attach(this);
 
+  replot();
   return curve;
 }
 //----------------------------------------------------------------------------
@@ -544,17 +561,16 @@ void PlotArea::removeCurve(QwtPlotCurve *curve)
     d_crv.removeAll(curve);
     delete curve;
   }
+
+  replot();
 }
 //----------------------------------------------------------------------------
 void PlotArea::redraw()
 {
   qDebug("PlotArea::redraw()");
-
   d_zoomer[0]->setZoomBase();
   d_zoomer[1]->setZoomBase();
-
   updateLayout();
-
   replot();
 }
 //----------------------------------------------------------------------------
@@ -562,7 +578,6 @@ void PlotArea::scrollX(double xStep)
 {
   qDebug("PlotArea::scrollX(double xStep=%g)", xStep);
 
-  bool doAutoReplot = autoReplot();
   int xAxisList[] = {QwtPlot::xBottom, QwtPlot::xTop};
 
   for (int i = 0; i < 2; i++)
@@ -574,7 +589,6 @@ void PlotArea::scrollX(double xStep)
     setAxisScale(axisId, x1 + dx, x2 + dx);
   }
 
-  setAutoReplot(doAutoReplot);
   replot();
 }
 //----------------------------------------------------------------------------
@@ -582,7 +596,6 @@ void PlotArea::scrollY(double yStep)
 {
   qDebug("PlotArea::scrollY(double yStep=%g)", yStep);
 
-  bool doAutoReplot = autoReplot();
   int yAxisList[] = {QwtPlot::yLeft, QwtPlot::yRight};
   
   for (int i = 0; i < 2; i++)
@@ -593,8 +606,7 @@ void PlotArea::scrollY(double yStep)
     double dy = yStep * (y2 - y1) / 100.;
     setAxisScale(axisId, y1 + dy, y2 + dy);
   }
-  
-  setAutoReplot(doAutoReplot);
+
   replot();
 }
 //----------------------------------------------------------------------------
@@ -602,7 +614,6 @@ void PlotArea::center()
 {
   qDebug("PlotArea::center()");
 
-  bool doAutoReplot = autoReplot();
   int yAxisList[] = { QwtPlot::xBottom, QwtPlot::xTop,
                       QwtPlot::yLeft,   QwtPlot::yRight };
 
@@ -618,7 +629,6 @@ void PlotArea::center()
     setAxisScale(axisId, pos[i] - dd, pos[i] + dd);
   }
 
-  setAutoReplot(doAutoReplot);
   replot();
 }
 //----------------------------------------------------------------------------
@@ -776,8 +786,8 @@ void PlotArea::mousePressEvent(QMouseEvent *event)
                                                      "UnknownButton";
   qDebug("PlotArea::mousePressEvent(%s)", button);
   
-  if (modifiers == Qt::ControlModifier && (buttons & Qt::RightButton))
-  { // Ctrl + FightButton => reset zoom
+  if (modifiers == Qt::ShiftModifier && (buttons & Qt::RightButton))
+  { // Shift + RightButton => reset zoom
     if (!checkZoom())
       resetZoom(); // в режиме "zoom on" сочетание перехватывает Qwt
     event->accept();
@@ -805,17 +815,21 @@ void PlotArea::mouseDoubleClickEvent(QMouseEvent *event)
 //----------------------------------------------------------------------------
 void PlotArea::wheelEvent(QWheelEvent *event)
 {
-  Qt::KeyboardModifiers modifiers = event->modifiers();
   qDebug("PlotArea::wheelEvent(delta=%i)", event->delta());
 
-  float numDegrees = (float) event->delta() / 8.;
-  float numSteps = numDegrees / 15.;
+  Qt::KeyboardModifiers modifiers = event->modifiers();
+  Qt::MouseButtons buttons = event->buttons();
 
-  if (event->orientation() == Qt::Horizontal || modifiers == Qt::ShiftModifier)
-    scrollX(numSteps * d_conf.scrollXStep);
-  else
-    scrollY(numSteps * d_conf.scrollYStep);
+  if (modifiers != Qt::ControlModifier && buttons == Qt::NoButton)
+  { // scroll if Ctrl and any buttons unpressed
+    float numDegrees = (float) event->delta() / 8.;
+    float numSteps = numDegrees / 15.;
 
+    if (event->orientation() == Qt::Horizontal || modifiers == Qt::ShiftModifier)
+      scrollX(numSteps * d_conf.scrollXStep);
+    else
+      scrollY(numSteps * d_conf.scrollYStep);
+  }
   event->accept();
 }
 //----------------------------------------------------------------------------
@@ -851,7 +865,7 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
          k);
 
   if (k == Qt::Key_Z)
-  { // "Z" -> zoom On/Off
+  { // "Z" -> zoom on/off
     enableZoom(!checkZoom());
   }
   else if (k == Qt::Key_R)
@@ -864,17 +878,17 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
       resetZoom(); // в режиме "zoom on" ESC перехватывает Qwt
   }
   else if (k == Qt::Key_L)
-  { // "L" -> legend On/Off
+  { // "L" -> legend on/off
     bool on = !checkLegend();
     enableLegend(on);
   }
   else if (k == Qt::Key_G)
-  { // "G" -> grid On/Off
+  { // "G" -> grid on/off
     bool on = !checkGrid();
     enableGrid(on);
   }
   else if (k == Qt::Key_A)
-  { // "A" -> antialiased On/Off
+  { // "A" -> antialiased on/off
     bool on = !checkAntialiased();
     enableAntialiased(on);
   }

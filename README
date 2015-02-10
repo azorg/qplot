@@ -1,4 +1,4 @@
 QPlot - 2d plotting tool based on Qwt project (http://qwt.sf.net)
 -----------------------------------------------------------------
-QPlot uses Qt5 ver >= 5.2.1 and Qwt ver >= 6.1.2
+QPlot uses Qt ver >= 4.8.1 and Qwt ver >= 6.1.2
 
