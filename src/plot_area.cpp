@@ -92,7 +92,7 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
 
   setAutoReplot(false);
 
-  //!!! FIXME
+  //!!!
   const int margin = 3;
   this->setContentsMargins( margin, margin, margin, 0);
   setContextMenuPolicy( Qt::NoContextMenu );
@@ -138,9 +138,8 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
   setConf(d_conf);
 
   // выделене с помощью zoom'а
-  //!!! FIXME
-  //connect(zoomer[0], SIGNAL(zoomed(const QwtDoubleRect &)),
-  //                     SLOT(zoomed(const QwtDoubleRect &)));
+  connect(d_zoomer[0], SIGNAL(zoomed(const QRectF &)),
+                       SLOT(zoomed(const QRectF &)));
 }
 //----------------------------------------------------------------------------
 PlotArea::~PlotArea()
@@ -556,7 +555,7 @@ QwtPlotCurve* PlotArea::addCurve(
     curve->setStyle(style);
   }
 
-  //!!! FIXME легенда в форме линии
+  // легенда в форме линии
   //curve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
 
   // установить цвета/стиль/размер символов
@@ -781,29 +780,33 @@ void PlotArea::exportPrn(QString docName)
 #endif // !QT_NO_PRINTER
 }
 //----------------------------------------------------------------------------
-#if 0 //!!! FIXME
-void PlotArea::zoomed(const QwtDoubleRect &)
+void PlotArea::zoomed(const QRectF &rect0)
 {
-  qDebug("PlotArea::zoomed()");
+  qDebug("PlotArea::zoomed():");
 
-  QwtDoubleRect rect = zoomer[0]->zoomRect();
-  double xBottom = rect.x();
-  double wBottom = rect.width();
-  double yLeft   = rect.y();
-  double hLeft   = rect.height();
+  //QRectF rect0 = d_zoomer[0]->zoomRect();
+  double xBottom = rect0.x();
+  double wBottom = rect0.width();
+  double yLeft   = rect0.y();
+  double hLeft   = rect0.height();
+  qDebug() << "    "
+           << xBottom << ' ' << wBottom << ' '
+           << yLeft   << ' ' << hLeft;
 
-  rect = zoomer[1]->zoomRect();
-  double xTop    = rect.x();
-  double wTop    = rect.width();
-  double yRight  = rect.y();
-  double hRight  = rect.height();
+  QRectF rect1 = d_zoomer[1]->zoomRect();
+  double xTop    = rect1.x();
+  double wTop    = rect1.width();
+  double yRight  = rect1.y();
+  double hRight  = rect1.height();
+  qDebug() << "    "
+           << xTop   << ' ' << wTop << ' '
+           << yRight << ' ' << hRight;
 
-  emit scaleOn(xBottom, wBottom,
-               yLeft,   hLeft,
-               xTop,    wTop,
-               yRight,  hRight);
+  emit zoomOn(xBottom, wBottom,
+              yLeft,   hLeft,
+              xTop,    wTop,
+              yRight,  hRight);
 }
-#endif
 //----------------------------------------------------------------------------
 void PlotArea::mousePressEvent(QMouseEvent *event)
 {

@@ -216,16 +216,14 @@ signals:
   void antialiasedOn(bool on);  // on/off antialiased
 
 
-  // пользователь выполнил zoom или scroll
-  //!!! FIXME
-  //void scaleOn(double xBottom, double wBottom,
-  //             double yLeft,   double hLeft,
-  //             double xTop,    double wTop,
-  //             double yRight,  double hRight);
+  // пользователь выполнил zoom
+  void zoomOn(double xBottom, double wBottom,
+               double yLeft,   double hLeft,
+               double xTop,    double wTop,
+               double yRight,  double hRight);
 
 private Q_SLOTS:
-  //!!! FIXME
-  //void zoomed(const QwtDoubleRect &rect); // совершен zoom
+  void zoomed(const QRectF &rect); // совершен zoom
 
 protected:
   void mousePressEvent(QMouseEvent *event);
