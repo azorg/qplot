@@ -19,15 +19,14 @@ public:
   // вывести сообщение в строку состояния
   void showInfo(QString text = QString::null);
 
-  // демонстрационный вывод графика
-  void demoPlot();
-
 private Q_SLOTS:
-  // главное меню
-  void on_actExportImg_triggered();        // File->Export to Image
-  void on_actExportSvg_triggered();        // File->Export to SVG
-  void on_actExportPdf_triggered();        // File->Export to PDF
-  void on_actExportPrn_triggered();        // File->Print (Export to PDF/PS)
+  // обработчики пунктов главного меню:
+  void on_actOpenFile_triggered();  // File->Open QPlot mission INI-file
+
+  void on_actExportImg_triggered(); // File->Export to Image
+  void on_actExportSvg_triggered(); // File->Export to SVG
+  void on_actExportPdf_triggered(); // File->Export to PDF
+  void on_actExportPrn_triggered(); // File->Print (Export to PDF/PS)
 
   void on_actZoom_toggled(bool on);        // View->Zoom
   void on_actResetZoom_triggered();        // View->Reset Zooom
@@ -35,9 +34,9 @@ private Q_SLOTS:
   void on_actGrid_toggled(bool on);        // View->Grid
   void on_actAntialiased_toggled(bool on); // View->Antialiased
 
-  void on_actAbout_triggered();            // Help->About
-  void on_actAboutQt_triggered();          // Help->About Qt
-  void on_actDemo_triggered();             // Help->Demo
+  void on_actAbout_triggered();   // Help->About
+  void on_actAboutQt_triggered(); // Help->About Qt
+  void on_actDemo_triggered();    // Help->Demo
 
   // обработчики сигналов от ui->pa (PlotArea)
   void on_pa_zoomOn(bool on);        // zoom on/off
@@ -55,13 +54,12 @@ private Q_SLOTS:
   void on_pa_keyOn(QKeyEvent *event);
 
   //!!! FIXME
-  //void on_pa_scaled(double xBottom, double wBottom, // zoomed or scralled
+  //void on_pa_zoomed(double xBottom, double wBottom, // zoomed
   //                  double yLeft,   double hLeft,
   //                  double xTop,    double wTop,
   //                  double yRight,  double hRight);
 
 private:
-  bool demo; // true in demo mode
   Ui::PlotWin *ui;
 };
 //----------------------------------------------------------------------------

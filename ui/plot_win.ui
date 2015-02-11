@@ -44,6 +44,8 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actOpenFile"/>
+    <addaction name="separator"/>
     <addaction name="actExportImg"/>
     <addaction name="actExportSvg"/>
     <addaction name="actExportPdf"/>
@@ -151,6 +153,11 @@
   <action name="actDemo">
    <property name="text">
     <string>Demo</string>
+   </property>
+  </action>
+  <action name="actOpenFile">
+   <property name="text">
+    <string>Open QPlot mission INI-file</string>
    </property>
   </action>
  </widget>

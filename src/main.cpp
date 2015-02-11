@@ -6,7 +6,8 @@
 //#include <qapplication.h> // QApplication
 #include <QApplication>
 #include "plot_win.h" // PlotWin
-#include "aini.h"     // aclass::aini   
+#include "aini.h"     // aclass::aini
+#include "qplot.h"
 //----------------------------------------------------------------------------
 // имя INI-файла по-умолчанию
 #ifdef QPLOT_WIN32
@@ -15,15 +16,17 @@
 #  define QPLOT_INI_FILE ".qplotrc"  // для Linux
 #  include <getopt.h>
 #endif
-static std::string ini_file = QPLOT_INI_FILE;
+//----------------------------------------------------------------------------
+static std::string main_ini_file;
 //----------------------------------------------------------------------------
 #ifndef QPLOT_WIN32
 static void usage(FILE *file)
 {
-  fprintf(file, "usage: qplot *.qplot\n");
-  fprintf(file, "options:\n");
-  fprintf(file, "  -c file | --config file - set config file\\n");
-  fprintf(file, "  -h      | --help        - this help\n\n");
+  fprintf(file, "usage: qplot [options]\n");
+  fprintf(file, "  options:\n");
+  fprintf(file, "    -r file | --run file    - run mission *.qplot INI-file\n");
+  fprintf(file, "    -c file | --config file - set qplot config file\n");
+  fprintf(file, "    -h      | --help        - this help\n\n");
   exit(1);
 }
 //---------------------------------------------------------------------------
@@ -31,10 +34,10 @@ static void usage(FILE *file)
 static void parse_cmd_options(int argc, char **argv)
 {
   // имя конфигурационного файла по-умолчанию (в домашнем каталоге)
-  ini_file = getenv("HOME");
-  if (ini_file.size() > 0)
-    ini_file += '/';
-  ini_file += QPLOT_INI_FILE;
+  main_ini_file = getenv("HOME");
+  if (main_ini_file.size() > 0)
+    main_ini_file += '/';
+  main_ini_file += QPLOT_INI_FILE;
 
   // разобрать переданные опции (getopt_long)
   while (1)
@@ -43,17 +46,22 @@ static void parse_cmd_options(int argc, char **argv)
 
     static struct option long_options[] = {
       // {char *name, int has_arg, int *flag, int val}
+      {"run",    1, (int*) NULL, 0},
       {"config", 1, (int*) NULL, 0},
       {"help",   0, (int*) NULL, 0},
       {(const char*) NULL, 0, (int*) NULL, 0}
     };
 
-    c = getopt_long(argc, argv, "c:h", long_options, &option_index);
+    c = getopt_long(argc, argv, "r:c:h", long_options, &option_index);
     if (c == -1) break;
 
-    if (c == 'c' || (c == 0 && option_index == 0)) // -c or --config option
+    if (c == 'r' || (c == 0 && option_index == 0)) // -r or --run option
     {
-      ini_file = (char*) optarg;
+      qplot_mission_file = (char*) optarg;
+    }
+    else if (c == 'c' || (c == 0 && option_index == 1)) // -c or --config option
+    {
+      main_ini_file = (char*) optarg;
     }
     else if (c == 'h' || (c == 0 && option_index == 2)) // -h or --help option
     {
@@ -73,7 +81,13 @@ int main(int argc, char *argv[])
   // обработать опции командной строки (UNIX-way)
 #ifndef QPLOT_WIN32
   parse_cmd_options(argc, argv);
-#endif // !QPLOT_WIN32
+#else
+  if (argc == 2)
+     qplot_mission_file = argv[1];
+#endif
+
+  if (qplot_mission_file.size() > 0)
+    qDebug("qplot_mission_file = '%s'", qplot_mission_file.c_str());
 
   qDebug("QT_VERSION=0x%08x", QT_VERSION);
 
@@ -85,7 +99,7 @@ int main(int argc, char *argv[])
  
   // открыть INI-файл
   setlocale(LC_NUMERIC, "C"); // десятичная точка = '.'
-  aclass::aini ini(ini_file);
+  aclass::aini ini(main_ini_file);
   
   // прочитать положение и размеры главного окна из INI-файла
   int x, y, w, h;

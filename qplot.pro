@@ -31,13 +31,13 @@ SOURCES += \
   libs/clib/ini.c \
   src/plot_area.cpp \
   src/plot_win.cpp \
-  src/core.cpp \
+  src/qplot.cpp \
   src/main.cpp
 
 HEADERS += \
   src/plot_area.h \
   src/plot_win.h \
-  src/core.h
+  src/qplot.h
 
 FORMS += \
   ui/plot_win.ui
