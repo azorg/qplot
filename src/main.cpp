@@ -7,7 +7,6 @@
 #include <QApplication>
 #include "plot_win.h" // PlotWin
 #include "aini.h"     // aclass::aini
-#include "qplot.h"
 //----------------------------------------------------------------------------
 // имя INI-файла по-умолчанию
 #ifdef QPLOT_WIN32
@@ -17,7 +16,7 @@
 #  include <getopt.h>
 #endif
 //----------------------------------------------------------------------------
-static std::string main_ini_file;
+static std::string ini_file; // имя INI-файла конфигурации qplot
 //----------------------------------------------------------------------------
 #ifndef QPLOT_WIN32
 static void usage(FILE *file)
@@ -31,13 +30,16 @@ static void usage(FILE *file)
 }
 //---------------------------------------------------------------------------
 // обработать опции командной строки (в UNIX-like ОС только)
-static void parse_cmd_options(int argc, char **argv)
+// функция фозвращает имя файла задания
+static std::string parse_cmd_options(int argc, char **argv)
 {
+  std::string mission_file;
+
   // имя конфигурационного файла по-умолчанию (в домашнем каталоге)
-  main_ini_file = getenv("HOME");
-  if (main_ini_file.size() > 0)
-    main_ini_file += '/';
-  main_ini_file += QPLOT_INI_FILE;
+  ini_file = getenv("HOME");
+  if (ini_file.size() > 0)
+    ini_file += '/';
+  ini_file += QPLOT_INI_FILE;
 
   // разобрать переданные опции (getopt_long)
   while (1)
@@ -55,15 +57,15 @@ static void parse_cmd_options(int argc, char **argv)
     c = getopt_long(argc, argv, "r:c:h", long_options, &option_index);
     if (c == -1) break;
 
-    if (c == 'r' || (c == 0 && option_index == 0)) // -r or --run option
+    if (c == 'r' || (c == 0 && option_index == 0)) // -r or --run
     {
-      qplot_mission_file = (char*) optarg;
+      mission_file = (char*) optarg;
     }
-    else if (c == 'c' || (c == 0 && option_index == 1)) // -c or --config option
+    else if (c == 'c' || (c == 0 && option_index == 1)) // -c or --config
     {
-      main_ini_file = (char*) optarg;
+      ini_file = (char*) optarg;
     }
-    else if (c == 'h' || (c == 0 && option_index == 2)) // -h or --help option
+    else if (c == 'h' || (c == 0 && option_index == 2)) // -h or --help
     {
       usage(stdout);
     }
@@ -73,21 +75,24 @@ static void parse_cmd_options(int argc, char **argv)
       exit(-1);
     }
   } // while (1)
+
+  return mission_file;
 }
 #endif // !QPLOT_WIN32
 //---------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
+  std::string mission_file;
+
   // обработать опции командной строки (UNIX-way)
 #ifndef QPLOT_WIN32
-  parse_cmd_options(argc, argv);
+  mission_file = parse_cmd_options(argc, argv);
 #else
   if (argc == 2)
-     qplot_mission_file = argv[1];
+     mission_file = argv[1];
 #endif
 
-  if (qplot_mission_file.size() > 0)
-    qDebug("qplot_mission_file = '%s'", qplot_mission_file.c_str());
+  qDebug("mission_file = '%s'", mission_file.c_str());
 
   qDebug("QT_VERSION=0x%08x", QT_VERSION);
 
@@ -95,11 +100,11 @@ int main(int argc, char *argv[])
   QApplication app(argc, argv);
 
   // главное окно приложения (единственное)
-  PlotWin pw;
+  PlotWin pw(mission_file);
  
   // открыть INI-файл
   setlocale(LC_NUMERIC, "C"); // десятичная точка = '.'
-  aclass::aini ini(main_ini_file);
+  aclass::aini ini(ini_file);
   
   // прочитать положение и размеры главного окна из INI-файла
   int x, y, w, h;
@@ -125,4 +130,3 @@ int main(int argc, char *argv[])
 //----------------------------------------------------------------------------
 
 /*** end of "main.cpp" ***/
-

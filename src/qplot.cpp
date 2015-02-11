@@ -5,11 +5,23 @@
 //----------------------------------------------------------------------------
 #include "qplot.h"
 //----------------------------------------------------------------------------
-std::string qplot_mission_file = ""; // имя INI-файла задания
+// постоить графики на основе файла задания
+// (возвращает false, если ни одного графика не построено)
+bool qplot_run(
+  const char *mission_file, // имя INI-айла задания
+  PlotArea   *pa)           // казатель на PlotArea : QwtPlot widget
+{
+  qDebug("qplot_run(mission_file='%s')", mission_file);
+  pa = pa;
+
+  return true;
+}
 //----------------------------------------------------------------------------
-// демонстрационное построение графиков (если нет задания)
+// демонстрационное построение графиков
 void qplot_demo(PlotArea *pa)
 {
+  qDebug("qplot_demo()");
+
   //!!!
   // set picker always on
   PlotAreaConf conf = pa->getConf();

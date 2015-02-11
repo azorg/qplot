@@ -92,7 +92,7 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
 
   setAutoReplot(false);
 
-  //!!!
+  //!!! FIXME
   const int margin = 3;
   this->setContentsMargins( margin, margin, margin, 0);
   setContextMenuPolicy( Qt::NoContextMenu );
@@ -576,7 +576,7 @@ QwtPlotCurve* PlotArea::addCurve(
   else
     curve->setSamples(xData, yData, sizeData);
 
-  // обавить указатель в список кривых
+  // добавить указатель в список кривых
   d_crv.append(curve);
 
   // привязать к QwtPlot

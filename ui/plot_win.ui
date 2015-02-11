@@ -37,7 +37,7 @@
      <x>0</x>
      <y>0</y>
      <width>647</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_file">
@@ -50,13 +50,14 @@
     <addaction name="actExportSvg"/>
     <addaction name="actExportPdf"/>
     <addaction name="actExportPrn"/>
+    <addaction name="separator"/>
+    <addaction name="actExit"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
      <string>View</string>
     </property>
     <addaction name="actZoom"/>
-    <addaction name="actResetZoom"/>
     <addaction name="actLegend"/>
     <addaction name="actGrid"/>
     <addaction name="actAntialiased"/>
@@ -65,9 +66,10 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actHelp"/>
+    <addaction name="separator"/>
     <addaction name="actAbout"/>
     <addaction name="actAboutQt"/>
-    <addaction name="actDemo"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menuView"/>
@@ -150,14 +152,19 @@
     <string>Antialiased</string>
    </property>
   </action>
-  <action name="actDemo">
+  <action name="actHelp">
    <property name="text">
-    <string>Demo</string>
+    <string>Help</string>
    </property>
   </action>
   <action name="actOpenFile">
    <property name="text">
     <string>Open QPlot mission INI-file</string>
+   </property>
+  </action>
+  <action name="actExit">
+   <property name="text">
+    <string>Exit</string>
    </property>
   </action>
  </widget>

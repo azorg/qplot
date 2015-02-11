@@ -13,7 +13,7 @@ class PlotWin : public QMainWindow
   Q_OBJECT
 
 public:
-  PlotWin(QWidget *parent = 0);
+  PlotWin(const std::string mission_file = "", QWidget *parent = 0);
   ~PlotWin();
 
   // вывести сообщение в строку состояния
@@ -22,21 +22,20 @@ public:
 private Q_SLOTS:
   // обработчики пунктов главного меню:
   void on_actOpenFile_triggered();  // File->Open QPlot mission INI-file
-
   void on_actExportImg_triggered(); // File->Export to Image
   void on_actExportSvg_triggered(); // File->Export to SVG
   void on_actExportPdf_triggered(); // File->Export to PDF
   void on_actExportPrn_triggered(); // File->Print (Export to PDF/PS)
+  void on_actExit_triggered();      // File->Exit
 
   void on_actZoom_toggled(bool on);        // View->Zoom
-  void on_actResetZoom_triggered();        // View->Reset Zooom
   void on_actLegend_toggled(bool on);      // View->Legend
   void on_actGrid_toggled(bool on);        // View->Grid
   void on_actAntialiased_toggled(bool on); // View->Antialiased
 
+  void on_actHelp_triggered();    // Help->Help
   void on_actAbout_triggered();   // Help->About
   void on_actAboutQt_triggered(); // Help->About Qt
-  void on_actDemo_triggered();    // Help->Demo
 
   // обработчики сигналов от ui->pa (PlotArea)
   void on_pa_zoomOn(bool on);        // zoom on/off

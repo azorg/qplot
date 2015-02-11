@@ -4,8 +4,9 @@
  */
 //----------------------------------------------------------------------------
 #include <QtGui>
-#include <QMessageBox>
 #include <QDebug>
+#include <QMessageBox>
+#include <QFileDialog>
 //----------------------------------------------------------------------------
 #include "plot_win.h"
 #include "qplot.h"
@@ -18,7 +19,8 @@ static const char *_b2s(bool on)
   return on ? str_true : str_false;
 }
 //----------------------------------------------------------------------------
-PlotWin::PlotWin(QWidget *parent) : QMainWindow(parent)
+PlotWin::PlotWin(const std::string mission_file, QWidget *parent) :
+  QMainWindow(parent)
 {
   qDebug("PlotWin::PlotWin(QWidget *parent=%p)", parent);
 
@@ -38,8 +40,17 @@ PlotWin::PlotWin(QWidget *parent) : QMainWindow(parent)
   if (ui->actGrid->isChecked() != on)
       ui->actGrid->setChecked(on);
 
-  //showInfo(tr("Select Help->demo in main menu"));
-  qplot_demo(ui->pa);
+  // построить графики по заданию или включить демо
+  if (mission_file != "")
+  { // файл задания указан в командной строке
+    if (qplot_run(mission_file.c_str(), ui->pa))
+      showInfo(tr("Success"));
+    else
+      qplot_demo(ui->pa);
+  }
+  else
+    qplot_demo(ui->pa);
+
   ui->pa->redraw();
 }
 //----------------------------------------------------------------------------
@@ -61,7 +72,21 @@ void PlotWin::on_actOpenFile_triggered()
 {
   qDebug("PlotWin::on_actOpenFile_triggered() <- "
          "File->Open QPlot mission INI-file");
-  //...
+
+  QString mission_file = QFileDialog::getOpenFileName(
+          this,
+          tr("Open QPlot mission INI-File"),
+          "",
+          tr("QPlot mission INI-file:  *.qplot, *ini(*.qplot *.ini);;"
+             "Any files:  *.*(*.*)"));
+
+  if (mission_file != "")
+  {
+    if (qplot_run(mission_file.toLocal8Bit().data(), ui->pa))
+      showInfo(tr("Success"));
+    else
+      showInfo(tr("Failure"));
+  }
 }
 //----------------------------------------------------------------------------
 void PlotWin::on_actExportImg_triggered()
@@ -96,20 +121,20 @@ void PlotWin::on_actExportPrn_triggered()
   ui->pa->exportPrn();
 }
 //----------------------------------------------------------------------------
+void PlotWin::on_actExit_triggered()
+{
+  qDebug("PlotWin::on_actExit_triggered() <- "
+         "File->Exit");
+
+  QCoreApplication::exit(0);
+}
+//----------------------------------------------------------------------------
 void PlotWin::on_actZoom_toggled(bool on)
 {
   qDebug("PlotWin::on_actZoom_toggled(bool on=%s) <- "
          "View->Zoom", _b2s(on));
 
   ui->pa->enableZoom(on);
-}
-//----------------------------------------------------------------------------
-void PlotWin::on_actResetZoom_triggered()
-{
-  qDebug("PlotWin::on_actResetZoom_triggered() <- "
-         "View->Reset Zoom");
-
-  ui->pa->resetZoom();
 }
 //----------------------------------------------------------------------------
 void PlotWin::on_actLegend_toggled(bool on)
@@ -136,6 +161,14 @@ void PlotWin::on_actAntialiased_toggled(bool on)
   ui->pa->enableAntialiased(on);
 }
 //----------------------------------------------------------------------------
+void PlotWin::on_actHelp_triggered()
+{
+  qDebug("PlotWin::on_actHelp_triggered() <- "
+         "Help->Help");
+  //!!! FIXME
+  //...
+}
+//----------------------------------------------------------------------------
 void PlotWin::on_actAbout_triggered()
 {
   qDebug("PlotWin::on_actAbout_triggered() <- "
@@ -155,15 +188,6 @@ void PlotWin::on_actAboutQt_triggered()
          "Help->About Qt");
 
   QMessageBox::aboutQt(this, tr("About Qt"));
-}
-//----------------------------------------------------------------------------
-void PlotWin::on_actDemo_triggered()
-{ 
-  qDebug("PlotWin::on_actDemo_triggered() <- "
-         "Help->Demo");
-
-  //!!! FIXME
-  qplot_demo(ui->pa);
 }
 //----------------------------------------------------------------------------
 #if 0 // FIXME
@@ -273,11 +297,14 @@ void PlotWin::on_pa_keyOn(QKeyEvent *event)
 
          k);
 
-  if (k == Qt::Key_F)
+  if (k == Qt::Key_F) // full screen mode
     setWindowState(windowState() ^ Qt::WindowFullScreen);
 
-  if (k == Qt::Key_Q)
-    QCoreApplication::exit(0);
+  if (k == Qt::Key_Q) // quit/exit
+    on_actExit_triggered();
+
+  if (k == Qt::Key_O) // open mission file
+    on_actOpenFile_triggered();
 
   event->accept();
 }
