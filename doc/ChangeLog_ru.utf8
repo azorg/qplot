@@ -1,4 +1,7 @@
 
+2015.02.11:
+ + проработан полный формат INI-файла заданий (см. example.qplot.ini)
+
 2015.02.10:
  * опять переделано упралвения для совместного сосуществования в QwtPlot
    QwtPlotZoomer + QwtPlotPanner + QwtPlotPicker + QwtPlotMagnifier

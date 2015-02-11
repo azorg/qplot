@@ -97,11 +97,10 @@ void PlotWin::demoPlot()
     x,                     // указатель на массив Y
     N,                     // число точек (X, Y)
     "X(t)",                // имя графика
-    QPen(Qt::red, 3),      // цвет/тип
+    QPen(Qt::red, 2.5),    // цвет/тип
     QwtPlot::xBottom,      // ось X
     QwtPlot::yLeft,        // ось Y
     QwtPlotCurve::Lines);  // тип кривой
-    //QwtPlotCurve::Sticks); // тип кривой
 
   // добавить график "Y(fi)"
   ui->pa->addCurve(
@@ -109,14 +108,15 @@ void PlotWin::demoPlot()
     y,                      // указатель на массив Y
     n,                      // число точек (X, Y)
     "Y(fi)",                // имя графика
-    QPen(Qt::green, 1.5),   // цвет/тип
+    QPen(Qt::green, 3),     // цвет/тип
     QwtPlot::xTop,          // ось X
     QwtPlot::yRight,        // ось Y
-    QwtPlotCurve::Lines,    // тип кривой
+    //QwtPlotCurve::Lines,  // тип кривой
+    QwtPlotCurve::Sticks,   // тип кривой
     QwtSymbol::XCross,      // тип символов
     QPen(Qt::black, 2),     // цвет символа
     QBrush(Qt::gray),       // заливка символа
-    5,                      // размер символа
+    7,                      // размер символа
     false);                 // признак исп. Raw Data
 
   //ui->pa->removeCurve(X);
