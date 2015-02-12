@@ -183,7 +183,6 @@ void PlotArea::setConf(const PlotAreaConf &newConf)
   d_zoomer[0]->setAxis(d_conf.trackerXAxis, d_conf.trackerYAxis);
   d_zoomer[1]->setAxis(d_conf.trackerXAxis != xBottom ? xBottom : xTop,
                        d_conf.trackerYAxis != yLeft   ? yLeft   : yRight);
-
   enableZoom(d_conf.zoom);
 
   // legend
@@ -191,6 +190,8 @@ void PlotArea::setConf(const PlotAreaConf &newConf)
 
   // grid
   enableGrid(d_conf.grid);
+  d_grid->setMajorPen(d_conf.gridMajorPen);
+  d_grid->setMinorPen(d_conf.gridMinorPen);
 
   // picker
   d_picker->setRubberBandPen(d_conf.pickerPen);

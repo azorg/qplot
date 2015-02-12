@@ -43,7 +43,7 @@ PlotWin::PlotWin(const std::string mission_file, QWidget *parent) :
   // построить графики по заданию или включить демо
   if (mission_file != "")
   { // файл задания указан в командной строке
-    if (qplot_run(mission_file.c_str(), ui->pa))
+    if (qplot_run(mission_file.c_str(), ui->pa, this))
       showInfo(tr("Success"));
     else
       qplot_demo(ui->pa);
@@ -82,7 +82,17 @@ void PlotWin::on_actOpenFile_triggered()
 
   if (mission_file != "")
   {
-    if (qplot_run(mission_file.toLocal8Bit().data(), ui->pa))
+    // проверить существует ли файл
+    FILE *f = fopen(mission_file.toLocal8Bit().data(), "r");
+    if (f == (FILE*) NULL)
+    { // can't open mission file
+      //...
+      showInfo(tr("Can't open mission INI-file"));
+      return;
+    }
+    fclose(f);
+
+    if (qplot_run(mission_file.toLocal8Bit().data(), ui->pa, this))
       showInfo(tr("Success"));
     else
       showInfo(tr("Failure"));
@@ -305,6 +315,15 @@ void PlotWin::on_pa_keyOn(QKeyEvent *event)
 
   if (k == Qt::Key_O) // open mission file
     on_actOpenFile_triggered();
+
+  if (k == Qt::Key_D) // demo
+    qplot_demo(ui->pa);
+
+  if (k == Qt::Key_I) //!!! FIXME debug
+  {
+    qplot_run("doc/example.qplot.ini", ui->pa, this);
+
+  }
 
   event->accept();
 }

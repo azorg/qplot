@@ -51,7 +51,7 @@ public:
     markerStyle     = QwtSymbol::Diamond;
     markerBrush     = QColor(Qt::yellow);
     markerPen       = QColor(Qt::blue);
-    markerSize      = 10;
+    markerSize      = 9;
     markerTextColor = Qt::blue;
     markerFont      = QFont("Helvetica", 10, QFont::Bold);
   }

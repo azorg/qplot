@@ -29,12 +29,17 @@ INCLUDEPATH += \
 SOURCES += \
   libs/clib/str.c \
   libs/clib/ini.c \
+  libs/clib/fsize.c \
   src/plot_area.cpp \
   src/plot_win.cpp \
   src/qplot.cpp \
   src/main.cpp
 
 HEADERS += \
+  libs/clib/str.h \
+  libs/clib/ini.h \
+  libs/clib/aini.h \
+  libs/clib/fsize.h \
   src/plot_area.h \
   src/plot_win.h \
   src/qplot.h

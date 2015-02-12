@@ -19,6 +19,9 @@ public:
   // вывести сообщение в строку состояния
   void showInfo(QString text = QString::null);
 
+  // доступ к PlotArea
+  PlotArea *pa() { return ui->pa; }
+
 private Q_SLOTS:
   // обработчики пунктов главного меню:
   void on_actOpenFile_triggered();  // File->Open QPlot mission INI-file

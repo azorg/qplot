@@ -5,8 +5,10 @@
 //----------------------------------------------------------------------------
 //#include <qapplication.h> // QApplication
 #include <QApplication>
-#include "plot_win.h" // PlotWin
-#include "aini.h"     // aclass::aini
+#include "plot_win.h"  // PlotWin
+#include "plot_area.h" // PlotArea, PlotAreaConf
+#include "aini.h"      // aclass::aini
+#include "qplot.h"     // qplot_read_conf()
 //----------------------------------------------------------------------------
 // имя INI-файла по-умолчанию
 #ifdef QPLOT_WIN32
@@ -82,6 +84,8 @@ static std::string parse_cmd_options(int argc, char **argv)
 //---------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
+  qDebug("QT_VERSION=0x%08x", QT_VERSION);
+
   std::string mission_file;
 
   // обработать опции командной строки (UNIX-way)
@@ -91,10 +95,6 @@ int main(int argc, char *argv[])
   if (argc == 2)
      mission_file = argv[1];
 #endif
-
-  qDebug("mission_file = '%s'", mission_file.c_str());
-
-  qDebug("QT_VERSION=0x%08x", QT_VERSION);
 
   // Qt приложение
   QApplication app(argc, argv);
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
   setlocale(LC_NUMERIC, "C"); // десятичная точка = '.'
   aclass::aini ini(ini_file);
   
-  // прочитать положение и размеры главного окна из INI-файла
+  // прочитать положение и размеры главного окна изсекции [PlotWin]
   int x, y, w, h;
   pw.geometry().getRect(&x, &y, &w, &h);
   x = ini.read_long("PlotWin", "x", x);
@@ -114,6 +114,13 @@ int main(int argc, char *argv[])
   w = ini.read_long("PlotWin", "w", w);
   h = ini.read_long("PlotWin", "h", h);
   pw.setGeometry(x, y, w, h);
+
+  // прочитать секцию [PlotArea] и настроить PlotAreaConf
+  PlotAreaConf conf = pw.pa()->getConf();
+  qplot_read_conf(&ini, "PlotArea", &conf);
+  pw.pa()->setConf(conf);
+
+  // показать главное окно
   pw.show();
 
   int retv = app.exec();
