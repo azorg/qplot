@@ -5,38 +5,15 @@
 //----------------------------------------------------------------------------
 #include "qplot.h"
 //----------------------------------------------------------------------------
-// std::string -> QString
-#define _QS(str) QString::fromLocal8Bit(str.c_str())
+#define _SET_COLOR(ini_file, section, ident, color)   \
+  color = QColor(ini_file->read_str(section, ident,   \
+                                    _CS(color.name()) \
+                                   ).c_str());
 //----------------------------------------------------------------------------
-// QString -> char*
-#define _CS(str) (str.toLocal8Bit().data())
-//----------------------------------------------------------------------------
-static void qplot_set_color(aclass::aini *ini_file,
-                            const char *section, const char *ident,
-                            QColor &color)
-{
- color = QColor(ini_file->read_str(section, ident,
-                                   _CS(color.name())
-                                  ).c_str());
-}
-//----------------------------------------------------------------------------
-static void qplot_set_pen_color(aclass::aini *ini_file,
-                                 const char *section, const char *ident,
-                                 QPen &pen)
-{
-  pen.setColor(QColor(ini_file->read_str(section, ident,
-                                         _CS(pen.color().name())
+#define _SET_PEN_COLOR(ini_file, section, ident, pen)            \
+  pen.setColor(QColor(ini_file->read_str(section, ident,         \
+                                         _CS(pen.color().name()) \
                                         ).c_str()));
-}
-//----------------------------------------------------------------------------
-static void qplot_set_brush_color(aclass::aini *ini_file,
-                                 const char *section, const char *ident,
-                                 QBrush &brush)
-{
-  brush.setColor(QColor(ini_file->read_str(section, ident,
-                                           _CS(brush.color().name())
-                                          ).c_str()));
-}
 //----------------------------------------------------------------------------
 // заполнить PlotAreaConf из секции INI-файла
 bool qplot_read_conf(aclass::aini *f,    // INI-file
@@ -64,34 +41,62 @@ bool qplot_read_conf(aclass::aini *f,    // INI-file
   conf->scrollYStep = f->read_double(s, "scrollYStep", conf->scrollYStep);
 
   // основные цвета
-  qplot_set_color      (f, s, "background",     conf->background);
-  qplot_set_pen_color  (f, s, "zoomColor",      conf->zoomPen);
-  qplot_set_pen_color  (f, s, "gridMajorColor", conf->gridMajorPen);
-  qplot_set_pen_color  (f, s, "gridMinorColor", conf->gridMinorPen);
-  qplot_set_pen_color  (f, s, "pickerColor",    conf->pickerPen);
-  qplot_set_pen_color  (f, s, "trackerColor",   conf->trackerPen);
-  qplot_set_pen_color  (f, s, "vLineColor",     conf->vLinePen);
-  qplot_set_pen_color  (f, s, "hLineColor",     conf->hLinePen);
-  qplot_set_pen_color  (f, s, "markerColor",    conf->markerPen);
-  qplot_set_brush_color(f, s, "markerBrush",    conf->markerBrush);
+  _SET_COLOR    (f, s, "background",     conf->background);
+  _SET_PEN_COLOR(f, s, "zoomColor",      conf->zoomPen);
+  _SET_PEN_COLOR(f, s, "gridMajorColor", conf->gridMajorPen);
+  _SET_PEN_COLOR(f, s, "gridMinorColor", conf->gridMinorPen);
+  _SET_PEN_COLOR(f, s, "pickerColor",    conf->pickerPen);
+  _SET_PEN_COLOR(f, s, "trackerColor",   conf->trackerPen);
+  _SET_PEN_COLOR(f, s, "vLineColor",     conf->vLinePen);
+  _SET_PEN_COLOR(f, s, "hLineColor",     conf->hLinePen);
+  _SET_PEN_COLOR(f, s, "markerColor",    conf->markerPen);
+  _SET_PEN_COLOR(f, s, "markerBrush",    conf->markerBrush);
+  conf->vLineTextColor  = conf->vLinePen.color();
+  conf->hLineTextColor  = conf->hLinePen.color();
+  conf->markerTextColor = conf->markerPen.color();
 
   // основной шрифт
-  QString fontFamily = _QS(f->read_str(s, "font",
+  QString fontFamily = _QS(f->read_str(s, "fontFamily",
                                        _CS(conf->markerFont.family())));
+  conf->trackerFont.setFamily(fontFamily);
   conf->markerFont.setFamily(fontFamily);
   conf->vLineFont.setFamily(fontFamily);
   conf->hLineFont.setFamily(fontFamily);
 
   int fontSize = (int) f->read_long(s, "fontSize",
                                     conf->markerFont.pointSize());
+  conf->trackerFont.setPointSize(fontSize);
   conf->markerFont.setPointSize(fontSize);
   conf->vLineFont.setPointSize(fontSize);
   conf->hLineFont.setPointSize(fontSize);
+  
+  int weight = conf->markerFont.weight();
+  std::string str = f->read_str(s, "fontWeight",
+                                weight == QFont::Light    ? "Light"    :
+                                weight == QFont::Normal   ? "Normal"   :
+                                weight == QFont::DemiBold ? "DemiBold" :
+                                weight == QFont::Bold     ? "Bold"     :
+                                weight == QFont::Black    ? "Black"    :
+                                "Normal");
+  transform(str.begin(), str.end(), str.begin(), tolower);
+  weight = str == "light"    ?  QFont::Light    :
+           str == "normal"   ?  QFont::Normal   :
+           str == "demibold" ?  QFont::DemiBold :
+           str == "bold"     ?  QFont::Bold     :
+           str == "black"    ?  QFont::Black    : QFont::Normal;
+  conf->trackerFont.setWeight(weight);
+  conf->markerFont.setWeight(weight);
+  conf->vLineFont.setWeight(weight);
+  conf->hLineFont.setWeight(weight);
+  bool italic = f->read_bool(s, "fontItalic", conf->markerFont.italic());
+  conf->trackerFont.setItalic(italic);
+  conf->markerFont.setItalic(italic);
+  conf->vLineFont.setItalic(italic);
+  conf->hLineFont.setItalic(italic);
 
   // размер маркера
   conf->markerSize = (int) f->read_long(s, "markerSize",
                                         (long) conf->markerSize);
-
   return true;
 }
 //----------------------------------------------------------------------------
@@ -103,35 +108,45 @@ bool qplot_run(
   QMainWindow *mw)           // указатель на PlotWin  : QMainWindow
 {
   qDebug("qplot_run(mission_file='%s')", mission_file);
-  pa = pa;
 
   // открыть INI-файл задания
-  aclass::aini mf(mission_file);
-//!!! FIXME
-//  if (!mf.has_section("0") && !mf.has_section("1"))
-//    return false; // no curve section
+  aclass::aini f(mission_file);
 
   // прочитать глобальную секцию
   // ---------------------------
-  // название для главного окна приложения
-  std::string title = mf.read_str("", "title", "");
+  // название главного окна приложения
+  std::string title = f.read_str("", "title", "");
   if (title.size()) mw->setWindowTitle(_QS(title));
 
   // заданная ширина и высота главного окна
   QSize wsize = mw->size();
-  int width = (int) mf.read_long("", "width", -1);
+  int width = (int) f.read_long("", "width", -1);
   if (width > 0) wsize.setWidth(width);
-  int height = (int) mf.read_long("", "height", -1);
+  int height = (int) f.read_long("", "height", -1);
   if (height > 0) wsize.setHeight(height);
   if (width > 0 || height > 0) mw->resize(wsize);
 
   // прочитать секцию [area] - заполнить PlotAreaConf
   // ------------------------------------------------
   PlotAreaConf conf = pa->getConf();
-  qplot_read_conf(&mf, "area", &conf);
-  pa->setConf(conf); // установить конфигурацию PlotArea
+  qplot_read_conf(&f, "area", &conf);
+  pa->setConf(conf);
 
-  pa->replot();
+  // отключить маркер и линии
+  pa->enableMarker(false);
+  pa->enableVLine(false);
+  pa->enableHLine(false);
+
+//!!! FIXME
+//  if (!mf.has_section("0") && !mf.has_section("1"))
+//    return false; // no curve section
+
+
+
+  // удалить все кривые
+  //pa->clear();
+  
+  pa->redraw();
   return true;
 }
 //----------------------------------------------------------------------------
@@ -139,12 +154,6 @@ bool qplot_run(
 void qplot_demo(PlotArea *pa)
 {
   qDebug("qplot_demo()");
-
-  //!!!
-  // set picker always on
-  PlotAreaConf conf = pa->getConf();
-  conf.pickerAlwaysOn = true;
-  pa->setConf(conf);
 
   // create curves data
   int N = 1000; // !!!
@@ -175,7 +184,7 @@ void qplot_demo(PlotArea *pa)
     x,                     // указатель на массив Y
     N,                     // число точек (X, Y)
     "X(t)",                // имя графика
-    QPen(Qt::red, 5, Qt::DashLine, Qt::RoundCap), // цвет/тип
+    QPen(Qt::red, 2, Qt::DashLine, Qt::RoundCap), // цвет/тип
     QwtPlot::xBottom,      // ось X
     QwtPlot::yLeft,        // ось Y
     QwtPlotCurve::Lines);  // тип кривой
@@ -192,7 +201,7 @@ void qplot_demo(PlotArea *pa)
     //QwtPlotCurve::Lines,  // тип кривой
     QwtPlotCurve::Sticks,   // тип кривой
     QwtSymbol::XCross,      // тип символов
-    QPen(Qt::black, 2),     // цвет символа
+    QPen(Qt::magenta, 2),   // цвет символа
     QBrush(Qt::gray),       // заливка символа
     7,                      // размер символа
     false);                 // признак исп. Raw Data
@@ -225,8 +234,8 @@ void qplot_demo(PlotArea *pa)
   pa->setHLine(-0.5);
   pa->setMarker(200., 0.5);
 
-  //pa->redraw();
-  //pa->replot();
+  pa->redraw();
 }
 //----------------------------------------------------------------------------
-/*** end of "core.h" file ***/
+/*** end of "qplot.cpp" file ***/
+

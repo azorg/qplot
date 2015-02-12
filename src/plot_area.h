@@ -40,6 +40,7 @@ public:
     trackerPen      = QColor(Qt::darkBlue);
     trackerXAxis    = QwtPlot::xBottom;     // нижняя ось X
     trackerYAxis    = QwtPlot::yLeft;       // левая ось Y
+    trackerFont     = QFont("Helvetica", 10, QFont::Bold);
     scrollXStep     = 2.;                   // шаг сдвига/прокрутки по X 2%
     scrollYStep     = 2.;                   // шаг сдвига/прокрутки по Y 2%
     vLinePen        = QPen(Qt::blue, 0, Qt::DashDotLine);
@@ -73,6 +74,7 @@ public:
   QPen trackerPen;                        // цвет трекера
   int trackerXAxis;                       // ось X трекера
   int trackerYAxis;                       // ось Y трекера
+  QFont trackerFont;                      // шрифт трекера
   double scrollXStep;                     // шаг сдвига по X [%]
   double scrollYStep;                     // шаг сдвига по Y [%]
   QPen   vLinePen;                        // тип вертикальной линии маркера

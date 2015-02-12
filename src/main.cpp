@@ -3,7 +3,6 @@
  * File: "main.cpp"
  */
 //----------------------------------------------------------------------------
-//#include <qapplication.h> // QApplication
 #include <QApplication>
 #include "plot_win.h"  // PlotWin
 #include "plot_area.h" // PlotArea, PlotAreaConf
@@ -14,7 +13,7 @@
 #ifdef QPLOT_WIN32
 #  define QPLOT_INI_FILE "qplot.ini" // для Windows
 #else
-#  define QPLOT_INI_FILE ".qplotrc"  // для Linux
+#  define QPLOT_INI_FILE ".qplotrc.ini"  // для Linux
 #  include <getopt.h>
 #endif
 //----------------------------------------------------------------------------
@@ -100,40 +99,59 @@ int main(int argc, char *argv[])
   QApplication app(argc, argv);
 
   // главное окно приложения (единственное)
-  PlotWin pw(mission_file);
+  PlotWin pw;
  
   // открыть INI-файл
   setlocale(LC_NUMERIC, "C"); // десятичная точка = '.'
-  aclass::aini ini(ini_file);
+  aclass::aini f(ini_file);
   
-  // прочитать положение и размеры главного окна изсекции [PlotWin]
+  // прочитать название главного окна приложения
+  std::string title = f.read_str("", "title", "");
+  if (title.size()) pw.setWindowTitle(_QS(title));
+  
+  // прочитать положение и размеры главного окна приложения
   int x, y, w, h;
   pw.geometry().getRect(&x, &y, &w, &h);
-  x = ini.read_long("PlotWin", "x", x);
-  y = ini.read_long("PlotWin", "y", y);
-  w = ini.read_long("PlotWin", "w", w);
-  h = ini.read_long("PlotWin", "h", h);
+  x = f.read_long("", "x",      x);
+  y = f.read_long("", "y",      y);
+  w = f.read_long("", "width",  w);
+  h = f.read_long("", "height", h);
   pw.setGeometry(x, y, w, h);
 
-  // прочитать секцию [PlotArea] и настроить PlotAreaConf
+  // прочитать секцию [area] и настроить PlotAreaConf
   PlotAreaConf conf = pw.pa()->getConf();
-  qplot_read_conf(&ini, "PlotArea", &conf);
+  qplot_read_conf(&f, "area", &conf);
   pw.pa()->setConf(conf);
 
   // показать главное окно
   pw.show();
 
+  // построить графики по заданию или включить демо
+  if (mission_file != "")
+  { // файл задания указан в командной строке
+    if (qplot_run(mission_file.c_str(), pw.pa(), &pw))
+      pw.showInfo("Success"); // FIXME
+    else
+      qplot_demo(pw.pa());
+  }
+  else
+    qplot_demo(pw.pa());
+  
   int retv = app.exec();
 
-  // сохранить положение и размер главного окна в INI-файл
+  // сохранить название главного окна приложения
+  f.write_str("", "title", _CS(pw.windowTitle()));
+  
+  // сохранить положение и размер главного окна приложения
   pw.geometry().getRect(&x, &y, &w, &h);
-  ini.write_long("PlotWin", "x", x);
-  ini.write_long("PlotWIn", "y", y);
-  ini.write_long("PlotWin", "w", w);
-  ini.write_long("PlotWin", "h", h);
+  f.write_long("", "x",      x);
+  f.write_long("", "y",      y);
+  f.write_long("", "width",  w);
+  f.write_long("", "height", h);
 
   return retv;
 }
 //----------------------------------------------------------------------------
 
 /*** end of "main.cpp" ***/
+

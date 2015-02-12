@@ -13,7 +13,7 @@ class PlotWin : public QMainWindow
   Q_OBJECT
 
 public:
-  PlotWin(const std::string mission_file = "", QWidget *parent = 0);
+  PlotWin(QWidget *parent = 0);
   ~PlotWin();
 
   // вывести сообщение в строку состояния

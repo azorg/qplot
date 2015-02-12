@@ -113,7 +113,7 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
   d_panner = new QwtPlotPanner(this->canvas());
   d_panner->setMouseButton(Qt::MidButton);
 
-  // picker (if zoom on)
+  // picker
   d_picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
                                QwtPlotPicker::CrossRubberBand,
                                QwtPicker::ActiveOnly, // set in setConf()
@@ -180,6 +180,7 @@ void PlotArea::setConf(const PlotAreaConf &newConf)
   // zoom
   d_zoomer[0]->setRubberBandPen(d_conf.zoomPen);
   d_zoomer[0]->setTrackerPen(d_conf.trackerPen);
+  d_zoomer[0]->setTrackerFont(d_conf.trackerFont);
   d_zoomer[0]->setAxis(d_conf.trackerXAxis, d_conf.trackerYAxis);
   d_zoomer[1]->setAxis(d_conf.trackerXAxis != xBottom ? xBottom : xTop,
                        d_conf.trackerYAxis != yLeft   ? yLeft   : yRight);
@@ -196,6 +197,7 @@ void PlotArea::setConf(const PlotAreaConf &newConf)
   // picker
   d_picker->setRubberBandPen(d_conf.pickerPen);
   d_picker->setTrackerPen(d_conf.trackerPen);
+  d_picker->setTrackerFont(d_conf.trackerFont);
   d_picker->setAxis(d_conf.trackerXAxis,
                     d_conf.trackerYAxis);
   if (d_conf.pickerAlwaysOn)
@@ -606,7 +608,7 @@ void PlotArea::redraw()
   d_zoomer[0]->setZoomBase();
   d_zoomer[1]->setZoomBase();
   updateLayout();
-  //replot();
+  replot();
 }
 //----------------------------------------------------------------------------
 void PlotArea::scrollX(double xStep)

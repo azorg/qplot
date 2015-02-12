@@ -19,8 +19,7 @@ static const char *_b2s(bool on)
   return on ? str_true : str_false;
 }
 //----------------------------------------------------------------------------
-PlotWin::PlotWin(const std::string mission_file, QWidget *parent) :
-  QMainWindow(parent)
+PlotWin::PlotWin(QWidget *parent) : QMainWindow(parent)
 {
   qDebug("PlotWin::PlotWin(QWidget *parent=%p)", parent);
 
@@ -39,17 +38,6 @@ PlotWin::PlotWin(const std::string mission_file, QWidget *parent) :
   on = ui->pa->checkGrid();
   if (ui->actGrid->isChecked() != on)
       ui->actGrid->setChecked(on);
-
-  // построить графики по заданию или включить демо
-  if (mission_file != "")
-  { // файл задания указан в командной строке
-    if (qplot_run(mission_file.c_str(), ui->pa, this))
-      showInfo(tr("Success"));
-    else
-      qplot_demo(ui->pa);
-  }
-  else
-    qplot_demo(ui->pa);
 
   ui->pa->redraw();
 }
