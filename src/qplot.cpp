@@ -3,6 +3,7 @@
  * File: "qplot.cpp"
  */
 //----------------------------------------------------------------------------
+#include <stdio.h>
 #include "qplot.h"
 //----------------------------------------------------------------------------
 #define _SET_COLOR(ini_file, section, ident, color)   \
@@ -100,6 +101,57 @@ bool qplot_read_conf(aclass::aini *f,    // INI-file
   return true;
 }
 //----------------------------------------------------------------------------
+#define _SET_AXIS_TITLE(f, s, i, axisId, pa)         \
+  if (f->has_ident(s, i))                            \
+  {                                                  \
+    std::string title = f->read_str(s, i, "");       \
+    if (title.size())                                \
+    {                                                \
+      pa->setAxisTitle(QwtPlot::axisId, _QS(title)); \
+      pa->enableAxis(QwtPlot::axisId, true);         \
+    }                                                \
+    else                                             \
+      pa->enableAxis(QwtPlot::axisId, false);        \
+  }
+//----------------------------------------------------------------------------
+#define _SET_AXIS_SCALE(f, s, i_min, i_max, axisId, pa) \
+  if (f->has_ident(s, i_min) && f->has_ident(s, i_max)) \
+  {                                                     \
+    double a_min = f->read_double(s, i_min);            \
+    double a_max = f->read_double(s, i_max);            \
+    pa->setAxisScale(QwtPlot::axisId, a_min, a_max);    \
+  }
+//----------------------------------------------------------------------------
+// установить параметры осей PlotArea из секции INI-файла
+bool qplot_read_axis(aclass::aini *f, // INI-file
+                     const char *s,   // section
+                     PlotArea *pa)    // output data
+{
+  // проверить наличие секции
+  if (!f->has_section(s)) return false;
+
+  qDebug("qplot_read_axis(): read section '%s'' in '%s' file",
+           s, f->get_fname());
+
+  // название построения
+  std::string title = f->read_str(s, "title", "");
+  pa->setTitle(_QS(title));
+
+  // подписи к осям
+  _SET_AXIS_TITLE(f, s, "xBottomTitle", xBottom, pa);
+  _SET_AXIS_TITLE(f, s, "xTopTitle",    xTop,    pa);
+  _SET_AXIS_TITLE(f, s, "yLeftTitle",   yLeft,   pa);
+  _SET_AXIS_TITLE(f, s, "yRightTitle",  yRight,  pa);
+
+  // пределы по осям
+  _SET_AXIS_SCALE(f, s, "xBottomMin", "xBottomMax", xBottom, pa);
+  _SET_AXIS_SCALE(f, s, "xTopMin",    "xTopMax",    xTop,    pa);
+  _SET_AXIS_SCALE(f, s, "yLeftMin",   "yLeftMax",   yLeft,   pa);
+  _SET_AXIS_SCALE(f, s, "yRightMin",  "yRightMax",  yRight,  pa);
+
+  return true;
+}
+//----------------------------------------------------------------------------
 // постоить графики на основе файла задания
 // (возвращает false, если ни одного графика не построено)
 bool qplot_run(
@@ -137,15 +189,44 @@ bool qplot_run(
   pa->enableVLine(false);
   pa->enableHLine(false);
 
-//!!! FIXME
-//  if (!mf.has_section("0") && !mf.has_section("1"))
-//    return false; // no curve section
+  // прочитать секцию [axis] - настроить оси
+  // ---------------------------------------
+  qplot_read_axis(&f, "axis", pa);
+
+  if (!f.has_section("0") && !f.has_section("1"))
+    return false; // no curve section
+
+  // удалить все построенные кривые
+  pa->clear();
+
+  // прочитать секции c описаниями кривых построений
+  int num = (int) f.read_long("", "num", 1000); //!!! FIXME
+  for (int i = 0; i < num; i++)
+  {
+    char s[32]; //!!! FIXME
+    snprintf(s, 30, "%i", i);
+    if (!f.has_section(s))
+      continue;
+
+    std::string file = f.read_str(s, "file", "");
+    if (file == "")
+      continue;
+
+    long start = f.read_long(s, "start", 0);
+    long size  = f.read_long(s, "size", -1);
+    long step  = f.read_long(s, "step",  1);
+    step = step > 0 ? step : 1;
+
+    std::string fmt = f.read_str(s, "format", "txt");
+    int format = 0; // text
+    if (fmt == "bin" || fmt == "binary" || fmt == "raw")
+      format = 1; // binary
 
 
 
-  // удалить все кривые
-  //pa->clear();
-  
+  }
+
+
   pa->redraw();
   return true;
 }
@@ -218,16 +299,16 @@ void qplot_demo(PlotArea *pa)
   //pa->setXYTitle(QwtPlot::xBottom, "t");
   //pa->setXYTitle(QwtPlot::yLeft,   "X");
   //pa->setXYTitle(QwtPlot::yRight,  "Y");
-  pa->enableXTop(true);   // ui->pa->enableAxis(QwtPlot::xTop);
-  pa->enableYRight(true); // ui->pa->enableAxis(QwtPlot::yRight);
+  //pa->enableXTop(true);   // ui->pa->enableAxis(QwtPlot::xTop);
+  //pa->enableYRight(true); // ui->pa->enableAxis(QwtPlot::yRight);
 
   // ox: 0...720, 0...4*M_PI
   pa->setAxisScale(QwtPlot::xBottom, 0., 720.);
   pa->setAxisScale(QwtPlot::xTop,    0., 4*M_PI);
 
   // oy: -1...1, -10...10
-  pa->setAxisScale(QwtPlot::yLeft,  -1., 1.);
-  pa->setAxisScale(QwtPlot::yRight, -10., 10.);
+  //pa->setAxisScale(QwtPlot::yLeft,  -1., 1.);
+  //pa->setAxisScale(QwtPlot::yRight, -10., 10.);
 
   // markers
   pa->setVLine(100);

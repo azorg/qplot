@@ -2,7 +2,7 @@ TARGET = qplot
 TEMPLATE = app
 
 CONFIG += silent
-#CONFIG += debug
+CONFIG += debug
 
 #DEFINES += QT_NO_DEBUG_OUTPUT
 DEFINES += __STDC_FORMAT_MACROS
@@ -23,23 +23,22 @@ LIBS += -L$${QWT}/lib -lqwt
 INCLUDEPATH += \
   $${QWT}/include \
   src \
-  libs \
-  libs/clib
+  clib
 
 SOURCES += \
-  libs/clib/str.c \
-  libs/clib/ini.c \
-  libs/clib/fsize.c \
+  clib/str.c \
+  clib/ini.c \
+  clib/fsize.c \
   src/plot_area.cpp \
   src/plot_win.cpp \
   src/qplot.cpp \
   src/main.cpp
 
 HEADERS += \
-  libs/clib/str.h \
-  libs/clib/ini.h \
-  libs/clib/aini.h \
-  libs/clib/fsize.h \
+  clib/str.h \
+  clib/ini.h \
+  clib/aini.h \
+  clib/fsize.h \
   src/plot_area.h \
   src/plot_win.h \
   src/qplot.h

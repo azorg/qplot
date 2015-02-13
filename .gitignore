@@ -1,12 +1,15 @@
 _bin_debug
 _bin_release
+
 .build
 .git
 .dep
 .obj
 *.d
 *.o
+
 Makefile
+
 qplot
 qplot.exe
 qplot.svg
@@ -15,3 +18,4 @@ qplot.pdf
 qplot.png
 qplot.jpg
 qplot.pro.user
+

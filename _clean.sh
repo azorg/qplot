@@ -8,7 +8,7 @@ rm -f ./Makefile
 #rm -rf ../_bin_debug
 #rm -rf ../_bin_release
 
-rm -f "$HOME/.qplotrc"
+rm -f "$HOME/.qplotrc.ini"
 rm -f "$HOME/qplot.ini"
 
 rm -f ./qplot-*.tgz
