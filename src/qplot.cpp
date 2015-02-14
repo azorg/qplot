@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------
 #include <stdio.h>
 #include "qplot.h"
+#include "qplot_tbl.h"
 //----------------------------------------------------------------------------
 #define _SET_COLOR(ini_file, section, ident, color)   \
   color = QColor(ini_file->read_str(section, ident,   \
@@ -15,6 +16,9 @@
   pen.setColor(QColor(ini_file->read_str(section, ident,         \
                                          _CS(pen.color().name()) \
                                         ).c_str()));
+//----------------------------------------------------------------------------
+// ignore case string compare (std::string std, const char *cstr)
+#define _STRCMP(std, cstr) str_icmp_cc(std.c_str(), cstr)
 //----------------------------------------------------------------------------
 // заполнить PlotAreaConf из секции INI-файла
 bool qplot_read_conf(aclass::aini *f,    // INI-file
@@ -127,6 +131,12 @@ bool qplot_read_axis(aclass::aini *f, // INI-file
                      const char *s,   // section
                      PlotArea *pa)    // output data
 {
+  // set autoscale by default
+  pa->setAxisAutoScale(QwtPlot::xBottom);
+  pa->setAxisAutoScale(QwtPlot::yLeft);
+  pa->setAxisAutoScale(QwtPlot::xTop);
+  pa->setAxisAutoScale(QwtPlot::yRight);
+
   // проверить наличие секции
   if (!f->has_section(s)) return false;
 
@@ -152,6 +162,52 @@ bool qplot_read_axis(aclass::aini *f, // INI-file
   return true;
 }
 //----------------------------------------------------------------------------
+static void qplot_read_binary(
+  const std::string file, long start, long size, long step,
+  int recordSize, int xType, int yType, int xOff, int yOff,
+  double **xData, double **yData, int *sizeData)
+{
+  //!!! FIXME
+
+  // пока тут заглушка
+  int N = 1000; // !!!
+
+  double *t  = new double[N];
+  double *x  = new double[N];
+  for (int i = 0; i < N; i++)
+  {
+    t[i]  = ((double) i) * 360. * 2. / ((double) N);
+    x[i]  = cos(t[i] * M_PI / 180.);
+  }
+
+  *xData = t;
+  *yData = x;
+  *sizeData = N;
+}
+//----------------------------------------------------------------------------
+static void qplot_read_text(
+  const std::string file, long start, long size, long step,
+  const std::string separator, int xCol, int yCol,
+  double **xData, double **yData, int *sizeData)
+{
+  //!!! FIXME
+
+  // пока тут заглушка
+  int n = 27;
+  double *fi = new double[n];
+  double *y  = new double[n];
+  for (int i = 0; i < n; i++)
+  {
+    double t  = ((double) i) * 360. * 2. / ((double) n);
+    fi[i] = t * M_PI / 180.;
+    y[i]  = sin(t * M_PI / 180.) * 10;
+  }
+
+  *xData = fi;
+  *yData = y;
+  *sizeData = n;
+}
+//----------------------------------------------------------------------------
 // постоить графики на основе файла задания
 // (возвращает false, если ни одного графика не построено)
 bool qplot_run(
@@ -161,16 +217,12 @@ bool qplot_run(
 {
   qDebug("qplot_run(mission_file='%s')", mission_file);
 
-  // открыть INI-файл задания
+  // open mission INI-file
   aclass::aini f(mission_file);
 
-  // прочитать глобальную секцию
-  // ---------------------------
-  // название главного окна приложения
   std::string title = f.read_str("", "title", "");
   if (title.size()) mw->setWindowTitle(_QS(title));
 
-  // заданная ширина и высота главного окна
   QSize wsize = mw->size();
   int width = (int) f.read_long("", "width", -1);
   if (width > 0) wsize.setWidth(width);
@@ -178,55 +230,127 @@ bool qplot_run(
   if (height > 0) wsize.setHeight(height);
   if (width > 0 || height > 0) mw->resize(wsize);
 
-  // прочитать секцию [area] - заполнить PlotAreaConf
-  // ------------------------------------------------
+  // read [area] section
   PlotAreaConf conf = pa->getConf();
   qplot_read_conf(&f, "area", &conf);
   pa->setConf(conf);
 
-  // отключить маркер и линии
+  // off all markers
   pa->enableMarker(false);
   pa->enableVLine(false);
   pa->enableHLine(false);
 
-  // прочитать секцию [axis] - настроить оси
-  // ---------------------------------------
+  // read [axis] section
   qplot_read_axis(&f, "axis", pa);
 
   if (!f.has_section("0") && !f.has_section("1"))
     return false; // no curve section
 
-  // удалить все построенные кривые
+  // remove all old curves
   pa->clear();
 
-  // прочитать секции c описаниями кривых построений
-  int num = (int) f.read_long("", "num", 1000); //!!! FIXME
+  // read curve description sections [0], [1], [2], ...
+  int num = (int) f.read_long("", "num", 100);
   for (int i = 0; i < num; i++)
   {
-    char s[32]; //!!! FIXME
-    snprintf(s, 30, "%i", i);
-    if (!f.has_section(s))
-      continue;
+    str_t tmp = str_int(i);
+    std::string s = str_c(&tmp);
+    str_free(&tmp);
+    if (!f.has_section(s)) continue;
+
+    double *xData, *yData;
+    int sizeData;
 
     std::string file = f.read_str(s, "file", "");
-    if (file == "")
-      continue;
+    if (file.size() == 0) continue;
 
     long start = f.read_long(s, "start", 0);
     long size  = f.read_long(s, "size", -1);
     long step  = f.read_long(s, "step",  1);
-    step = step > 0 ? step : 1;
+    if (step <= 0) step = 1;
 
     std::string fmt = f.read_str(s, "format", "txt");
-    int format = 0; // text
-    if (fmt == "bin" || fmt == "binary" || fmt == "raw")
-      format = 1; // binary
+    if (_STRCMP(fmt, "bin"   ) == 0 ||
+        _STRCMP(fmt, "binary") == 0 ||
+        _STRCMP(fmt, "raw"   ) == 0)
+    { // binary data file format
+      long recordSize = f.read_long(s, "recordSize");
+      if (recordSize <= 0)
+      {
+        qDebug("recordSize = %li, skip [%i] section",
+               recordSize, i);
+        continue;
+      }
+
+      int xOff = (int) f.read_long(s, "xOff", 0);
+      int yOff = (int) f.read_long(s, "yOff", 0);
+
+      std::string type = f.read_str(s, "xType", "float");
+      int xType = qplot_id_by_type(type);
+
+      type = f.read_str(s, "yType", "float");
+      int yType = qplot_id_by_type(type);
+
+      // прочитать данные из бинарного файла
+      qplot_read_binary(file, start, size, step,
+                        recordSize, xType, yType, xOff, yOff,
+                        &xData, &yData, &sizeData);
+    }
+    else
+    { // text data file format
+      std::string separator = f.read_str(s, "separator", " ");
+      int xCol = (int) f.read_long(s, "xCol", 0);
+      int yCol = (int) f.read_long(s, "yCol", 0);
+      qplot_read_text(file, start, size, step,
+                      separator, xCol, yCol,
+                      &xData, &yData, &sizeData);
+    }
+
+    if (sizeData <= 0)
+    {
+      qDebug("sizeData = %i, skip [%i] section", sizeData, i);
+      continue;
+    }
+
+    CurveConf conf;
+    conf.legend = _QS(f.read_str(s, "legend", ""));
+
+    conf.curve = qplot_qwt_curve_by_name(f.read_str(s, "curve", "lines"));
+
+    conf.pen = QPen(
+      QColor(f.read_str(s, "color", "black").c_str()),
+      f.read_double(s, "width", 1.0),
+      qplot_pen_by_name(f.read_str(s, "style", "solid")));
+
+    conf.symStyle = qplot_qwt_symbol_by_name(
+      f.read_str(s, "symbol", "no"));
+
+    conf.symPen = QPen(
+      QColor(f.read_str(s, "symColor", "blue").c_str()),
+      f.read_double(s, "symWidth", 1.0),
+      Qt::SolidLine);
+
+    conf.symBrush = QBrush(
+      QColor(f.read_str(s, "symBrush", "gray").c_str()));
+
+    conf.symSize = (int) f.read_long(s, "symSize", 7);
+
+    std::string axis = f.read_str(s, "axisX", "Bottom");
+    conf.xAxis = !_STRCMP(axis, "Top") ? QwtPlot::xTop : QwtPlot::xBottom;
+
+    axis = f.read_str(s, "axisY", "Left");
+    conf.yAxis = !_STRCMP(axis, "Right") ? QwtPlot::yRight : QwtPlot::yLeft;
+
+    pa->addCurve(xData, yData, sizeData, conf /*, false*/);
+
+    delete[] xData;
+    delete[] yData;
+  } // for (int i = 0; i < num; i++)
 
 
+//  pa->updateAxes();
 
-  }
-
-
+//  pa->replot();
   pa->redraw();
   return true;
 }
@@ -247,8 +371,8 @@ void qplot_demo(PlotArea *pa)
   }
 
   int n = 27;
-  double *fi = new double[N];
-  double *y  = new double[N];
+  double *fi = new double[n];
+  double *y  = new double[n];
   for (int i = 0; i < n; i++)
   {
     double t  = ((double) i) * 360. * 2. / ((double) n);
@@ -257,35 +381,38 @@ void qplot_demo(PlotArea *pa)
   }
 
   pa->clear();
+  CurveConf conf;
 
   // добавить график "X(t)"
+  conf.legend = "X(t)";
+  conf.curve  = QwtPlotCurve::Lines;
+  conf.pen    = QPen(Qt::red, 2, Qt::DashLine, Qt::RoundCap);
+  conf.xAxis  = QwtPlot::xBottom;
+  conf.yAxis  = QwtPlot::yLeft;
   //QwtPlotCurve *X =
   pa->addCurve(
-    t,                     // указатель на массив X
-    x,                     // указатель на массив Y
-    N,                     // число точек (X, Y)
-    "X(t)",                // имя графика
-    QPen(Qt::red, 2, Qt::DashLine, Qt::RoundCap), // цвет/тип
-    QwtPlot::xBottom,      // ось X
-    QwtPlot::yLeft,        // ось Y
-    QwtPlotCurve::Lines);  // тип кривой
+    t,     // указатель на массив X
+    x,     // указатель на массив Y
+    N,     // число точек (X, Y)
+    conf); // параметры отображения графика
 
   // добавить график "Y(fi)"
+  conf.legend   = "Y(fi)";
+  conf.curve    = QwtPlotCurve::Sticks;
+  conf.pen      = QPen(Qt::green, 3);
+  //conf.style  = QwtPlotCurve::Lines;
+  conf.symStyle = QwtSymbol::XCross;
+  conf.symPen   = QPen(Qt::magenta, 2);
+  conf.symBrush = QBrush(Qt::gray);
+  conf.symSize  = 7;
+  conf.xAxis    = QwtPlot::xTop;
+  conf.yAxis    = QwtPlot::yRight;
   pa->addCurve(
-    fi,                     // указатель на массив X
-    y,                      // указатель на массив Y
-    n,                      // число точек (X, Y)
-    "Y(fi)",                // имя графика
-    QPen(Qt::green, 3),     // цвет/тип
-    QwtPlot::xTop,          // ось X
-    QwtPlot::yRight,        // ось Y
-    //QwtPlotCurve::Lines,  // тип кривой
-    QwtPlotCurve::Sticks,   // тип кривой
-    QwtSymbol::XCross,      // тип символов
-    QPen(Qt::magenta, 2),   // цвет символа
-    QBrush(Qt::gray),       // заливка символа
-    7,                      // размер символа
-    false);                 // признак исп. Raw Data
+    fi,     // указатель на массив X
+    y,      // указатель на массив Y
+    n,      // число точек (X, Y)
+    conf,   // параметры отображения графика
+    false); // признак исп. Raw Data
 
   //pa->removeCurve(X);
 

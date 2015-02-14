@@ -17,7 +17,7 @@
 #include <qwt_plot_curve.h>     // QwtPlotCurve
 #include <qwt_symbol.h>         // QwtSymbol
 //----------------------------------------------------------------------------
-// параметры конфигурации для для PlotArea
+// параметры конфигурации для PlotArea
 class PlotAreaConf
 {
 public:
@@ -91,6 +91,34 @@ public:
   QFont            markerFont;            // шрифт маркера
 };
 //----------------------------------------------------------------------------
+// параметры для QwtPlotCurve
+class CurveConf
+{
+public:
+  CurveConf()
+  { // параметры по-умолчанию:
+    legend   = QString();           // имя графика
+    curve    = QwtPlotCurve::Lines; // тип кривой
+    pen      = QPen(Qt::black);     // цвет/стиль кривой
+    symStyle = QwtSymbol::NoSymbol; // тип символов
+    symPen   = QPen(Qt::black);     // цвет символа
+    symBrush = QBrush(Qt::gray);    // заливка символа
+    symSize  = 5;                   // размер символа
+    xAxis    = QwtPlot::xBottom;    // ось X
+    yAxis    = QwtPlot::yLeft;      // ось Y
+  }
+
+  QString legend;                 // имя графика
+  QwtPlotCurve::CurveStyle curve; // тип кривой
+  QPen pen;                       // цвет/стиль кривой
+  QwtSymbol::Style symStyle;      // тип символов
+  QPen symPen;                    // цвет символа
+  QBrush symBrush;                // заливка символа
+  int symSize;                    // размер символа
+  int xAxis;                      // ось X
+  int yAxis;                      // ось Y
+};
+//----------------------------------------------------------------------------
 class PlotAreaZoomer;
 class PlotAreaTracker;
 //----------------------------------------------------------------------------
@@ -162,22 +190,11 @@ public:
 
   // добавить график
   QwtPlotCurve *addCurve(
-    const double *xData,                  // указатель на массив X
-    const double *yData,                  // указатель на массив Y
-    int sizeData,                         // число точек (X, Y)
-    const QString &title = QString(),     // имя графика
-    const QPen &pen = QPen(Qt::black),    // цвет кривой
-    int xAxis = QwtPlot::xBottom,         // ось X
-    int yAxis = QwtPlot::yLeft,           // ось Y
-    QwtPlotCurve::CurveStyle
-          style = QwtPlotCurve::Lines,    // тип кривой
-    QwtSymbol::Style
-          symStyle = QwtSymbol::NoSymbol, // тип символов
-    const QPen &symPen = QPen(Qt::black), // цвет символа
-    const QBrush
-          &symBrush = QBrush(Qt::gray),   // заливка символа
-    int symSize = 5,                      // размер символа
-    bool rawData = false);                // признак исп. Raw Data
+    const double *xData,   // указатель на массив X
+    const double *yData,   // указатель на массив Y
+    int sizeData,          // число точек (X, Y)
+    const CurveConf &conf, // параметры отображения графика
+    bool rawData = false); // признак исп. Raw Data
 
   // удалить график
   void removeCurve(QwtPlotCurve *curve);

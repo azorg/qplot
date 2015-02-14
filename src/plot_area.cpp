@@ -528,50 +528,42 @@ void PlotArea::clear()
 }
 //----------------------------------------------------------------------------
 QwtPlotCurve* PlotArea::addCurve(
-  const double *xData,            // указатель на массив X
-  const double *yData,            // указатель на массив Y
-  int sizeData,                   // число точек (X, Y)
-  const QString &title,           // имя графика
-  const QPen &pen,                // цвет кривой
-  int xAxis,                      // ось X
-  int yAxis,                      // ось Y
-  QwtPlotCurve::CurveStyle style, // тип кривой
-  QwtSymbol::Style symStyle,      // тип символов
-  const QPen &symPen,             // цвет символа
-  const QBrush &symBrush,         // заливка символа
-  int symSize,                    // размер символа
-  bool rawData)                   // признак исп. Raw Data
+  const double *xData,   // указатель на массив X
+  const double *yData,   // указатель на массив Y
+  int sizeData,          // число точек (X, Y)
+  const CurveConf &conf, // параметры отображения графика
+  bool rawData)          // признак исп. Raw Data
 {
   qDebug("PlotArea::addCurve(int sizeData=%i)", sizeData);
 
   // создать новую кривую и добавить ее в список
-  QwtPlotCurve *curve = new QwtPlotCurve(title);
+  QwtPlotCurve *curve = new QwtPlotCurve(conf.legend);
 
   // сглаживание
   if (d_conf.antialiased)
     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
   // установить цвет/стиль
-  if (style != QwtPlotCurve::NoCurve)
+  if (conf.curve != QwtPlotCurve::NoCurve)
   {
-    curve->setPen(pen);
-    curve->setStyle(style);
+    curve->setStyle(conf.curve);
+    curve->setPen(conf.pen);
   }
 
   // легенда в форме линии
   //curve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
 
   // установить цвета/стиль/размер символов
-  if (symStyle != QwtSymbol::NoSymbol)
+  if (conf.symStyle != QwtSymbol::NoSymbol)
   {
-    QwtSymbol *sym = new QwtSymbol(symStyle, symBrush, symPen,
-                                   QSize(symSize, symSize));
+    QwtSymbol *sym = new QwtSymbol(conf.symStyle, conf.symBrush, conf.symPen,
+                                   QSize(conf.symSize, conf.symSize));
     curve->setSymbol(sym);
   }
 
   // привязать к осям
-  curve->setXAxis(xAxis);
-  curve->setYAxis(yAxis);
+  curve->setXAxis(conf.xAxis);
+  curve->setYAxis(conf.yAxis);
 
   // передать/привязать данные
   if (rawData)
@@ -982,5 +974,4 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
   emit keyOn(event);
 }
 //----------------------------------------------------------------------------
-
 /*** end of "plot_area.cpp" file ***/

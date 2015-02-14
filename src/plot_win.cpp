@@ -159,6 +159,19 @@ void PlotWin::on_actAntialiased_toggled(bool on)
   ui->pa->enableAntialiased(on);
 }
 //----------------------------------------------------------------------------
+void PlotWin::on_actAutoscale_triggered()
+{
+  qDebug("PlotWin::on_actAutoscale_triggered() <- "
+         "View->Auto scale axis");
+
+  ui->pa->setAxisAutoScale(QwtPlot::xBottom);
+  ui->pa->setAxisAutoScale(QwtPlot::yLeft);
+  ui->pa->setAxisAutoScale(QwtPlot::xTop);
+  ui->pa->setAxisAutoScale(QwtPlot::yRight);
+
+  ui->pa->replot();
+}
+//----------------------------------------------------------------------------
 void PlotWin::on_actHelp_triggered()
 {
   qDebug("PlotWin::on_actHelp_triggered() <- "
@@ -304,17 +317,20 @@ void PlotWin::on_pa_keyOn(QKeyEvent *event)
   if (k == Qt::Key_O) // open mission file
     on_actOpenFile_triggered();
 
+
+  if (k == Qt::Key_S) // auto scale axis
+    on_actAutoscale_triggered();
+
   if (k == Qt::Key_D) // demo
     qplot_demo(ui->pa);
 
   if (k == Qt::Key_I) //!!! FIXME debug
   {
-    qplot_run("doc/example.qplot.ini", ui->pa, this);
+    qplot_run("_example.qplot.ini", ui->pa, this);
 
   }
 
   event->accept();
 }
 //----------------------------------------------------------------------------
-
 /*** end of "plot_win.cpp" file ***/

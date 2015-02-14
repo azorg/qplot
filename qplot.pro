@@ -31,6 +31,7 @@ SOURCES += \
   clib/fsize.c \
   src/plot_area.cpp \
   src/plot_win.cpp \
+  src/qplot_tbl.cpp \
   src/qplot.cpp \
   src/main.cpp
 
@@ -41,6 +42,7 @@ HEADERS += \
   clib/fsize.h \
   src/plot_area.h \
   src/plot_win.h \
+  src/qplot_tbl.h \
   src/qplot.h
 
 FORMS += \

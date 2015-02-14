@@ -61,6 +61,8 @@
     <addaction name="actLegend"/>
     <addaction name="actGrid"/>
     <addaction name="actAntialiased"/>
+    <addaction name="separator"/>
+    <addaction name="actAutoscale"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -165,6 +167,11 @@
   <action name="actExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actAutoscale">
+   <property name="text">
+    <string>Auto scale axis</string>
    </property>
   </action>
  </widget>

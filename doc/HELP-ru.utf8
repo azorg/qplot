@@ -28,4 +28,6 @@
  * F - включить/выключить полноэкранный режим (PlotWin)
  * Q - выход из приложения (PlotWin)
  * O - открыть *.qplot| *.ini файл задания
+ * S - Auto scale axis
+ * D - Demo mode
 

@@ -35,6 +35,7 @@ private Q_SLOTS:
   void on_actLegend_toggled(bool on);      // View->Legend
   void on_actGrid_toggled(bool on);        // View->Grid
   void on_actAntialiased_toggled(bool on); // View->Antialiased
+  void on_actAutoscale_triggered();        // View->Auto scale axis
 
   void on_actHelp_triggered();    // Help->Help
   void on_actAbout_triggered();   // Help->About
