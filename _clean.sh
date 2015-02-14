@@ -22,3 +22,8 @@ rm -f ./qplot.pdf
 rm -f ./qplot.svg
 rm -f ./qplot.png
 
+PWD=`pwd`
+cd test
+./_clean_all.sh
+cd "$PWD"
+

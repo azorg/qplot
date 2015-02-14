@@ -272,8 +272,8 @@ void PlotWin::on_pa_clickOn(double xBottom, double xTop,
 
   QString info;
   //!!! FIXME
-  info.sprintf("x1=%g, x2=%g, y1=%g, y2=%g",
-               xBottom, xTop, yLeft, yRight);
+  info.sprintf("x1=%g, y1=%g, x2=%g, y2=%g",
+               xBottom, yLeft, xTop, yRight);
   showInfo(info);
 }
 //----------------------------------------------------------------------------
@@ -317,7 +317,6 @@ void PlotWin::on_pa_keyOn(QKeyEvent *event)
   if (k == Qt::Key_O) // open mission file
     on_actOpenFile_triggered();
 
-
   if (k == Qt::Key_S) // auto scale axis
     on_actAutoscale_triggered();
 
@@ -325,9 +324,8 @@ void PlotWin::on_pa_keyOn(QKeyEvent *event)
     qplot_demo(ui->pa);
 
   if (k == Qt::Key_I) //!!! FIXME debug
-  {
-    qplot_run("_example.qplot.ini", ui->pa, this);
-
+  { //!!! FIXME
+    qplot_run("binary.qplot.ini", ui->pa, this);
   }
 
   event->accept();

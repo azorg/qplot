@@ -124,6 +124,7 @@ bool qplot_read_conf(aclass::aini *f,    // INI-file
     double a_min = f->read_double(s, i_min);            \
     double a_max = f->read_double(s, i_max);            \
     pa->setAxisScale(QwtPlot::axisId, a_min, a_max);    \
+    pa->enableAxis(QwtPlot::axisId, true);              \
   }
 //----------------------------------------------------------------------------
 // установить параметры осей PlotArea из секции INI-файла
@@ -167,22 +168,57 @@ static void qplot_read_binary(
   int recordSize, int xType, int yType, int xOff, int yOff,
   double **xData, double **yData, int *sizeData)
 {
-  //!!! FIXME
+  std::vector<double> vx;
+  std::vector<double> vy;
 
-  // пока тут заглушка
-  int N = 1000; // !!!
-
-  double *t  = new double[N];
-  double *x  = new double[N];
-  for (int i = 0; i < N; i++)
-  {
-    t[i]  = ((double) i) * 360. * 2. / ((double) N);
-    x[i]  = cos(t[i] * M_PI / 180.);
+  FILE *f = fopen(file.c_str(), "rb");
+  if (f == (FILE*) NULL)
+  { // can't open data file
+    *sizeData = 0;
+    return;
   }
 
-  *xData = t;
-  *yData = x;
-  *sizeData = N;
+  char *buf = new char[recordSize];
+
+  long cnt = 0;
+  long step_cnt = 0;
+
+  while (fread(buf, recordSize, 1, f) == 1)
+  {
+    if (start != 0)
+    {
+      start--;
+      continue;
+    }
+
+    if (step_cnt-- != 0)
+      continue;
+    step_cnt = step - 1;
+
+    if (size != -1 && cnt >= size)
+      break;
+    cnt++;
+
+    vx.push_back(qplot_peek((const void*) buf, xOff, xType));
+    vy.push_back(qplot_peek((const void*) buf, yOff, yType));
+  } // while (fread()...)
+
+  delete[] buf;
+
+  fclose(f);
+
+  //!!! FIXME
+  double *px = new double[cnt];
+  double *py = new double[cnt];
+  for (int i = 0; i < cnt; i++)
+  {
+    px[i] = vx[i];
+    py[i] = vy[i];
+    //printf("#%i: (%g, %g)\n", i, vx[i], vy[i]); //!!! FIXME
+  }
+  *xData = px;
+  *yData = py;
+  *sizeData = cnt;
 }
 //----------------------------------------------------------------------------
 static void qplot_read_text(
@@ -250,8 +286,9 @@ bool qplot_run(
   pa->clear();
 
   // read curve description sections [0], [1], [2], ...
-  int num = (int) f.read_long("", "num", 100);
-  for (int i = 0; i < num; i++)
+  int begin = (int) f.read_long("", "begin", 0);
+  int end   = (int) f.read_long("", "end", 100);
+  for (int i = begin; i <= end; i++)
   {
     str_t tmp = str_int(i);
     std::string s = str_c(&tmp);
@@ -347,10 +384,6 @@ bool qplot_run(
     delete[] yData;
   } // for (int i = 0; i < num; i++)
 
-
-//  pa->updateAxes();
-
-//  pa->replot();
   pa->redraw();
   return true;
 }
@@ -384,11 +417,12 @@ void qplot_demo(PlotArea *pa)
   CurveConf conf;
 
   // добавить график "X(t)"
-  conf.legend = "X(t)";
-  conf.curve  = QwtPlotCurve::Lines;
-  conf.pen    = QPen(Qt::red, 2, Qt::DashLine, Qt::RoundCap);
-  conf.xAxis  = QwtPlot::xBottom;
-  conf.yAxis  = QwtPlot::yLeft;
+  conf.legend   = "X(t)";
+  conf.curve    = QwtPlotCurve::Lines;
+  conf.pen      = QPen(Qt::red, 2, Qt::DotLine, Qt::RoundCap);
+  conf.symStyle = QwtSymbol::NoSymbol;
+  conf.xAxis    = QwtPlot::xBottom;
+  conf.yAxis    = QwtPlot::yLeft;
   //QwtPlotCurve *X =
   pa->addCurve(
     t,     // указатель на массив X
@@ -398,11 +432,13 @@ void qplot_demo(PlotArea *pa)
 
   // добавить график "Y(fi)"
   conf.legend   = "Y(fi)";
+  //conf.curve    = QwtPlotCurve::NoCurve;
+  //conf.curve    = QwtPlotCurve::Steps;
   conf.curve    = QwtPlotCurve::Sticks;
-  conf.pen      = QPen(Qt::green, 3);
-  //conf.style  = QwtPlotCurve::Lines;
+  conf.pen      = QPen(Qt::green, 1);
   conf.symStyle = QwtSymbol::XCross;
-  conf.symPen   = QPen(Qt::magenta, 2);
+  //conf.symStyle = QwtSymbol::NoSymbol;
+  conf.symPen   = QPen(Qt::magenta, 3);
   conf.symBrush = QBrush(Qt::gray);
   conf.symSize  = 7;
   conf.xAxis    = QwtPlot::xTop;

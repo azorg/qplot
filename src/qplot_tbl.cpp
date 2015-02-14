@@ -6,24 +6,55 @@
 #include "qplot_tbl.h"
 #include "str.h"
 //----------------------------------------------------------------------------
+// get field as double
+double qplot_peek(const void *data, int offset, int type_id)
+{
+  const char *ptr = ((const char *) data) + offset;
+  switch (type_id)
+  {
+    case  1: return (double) *((char               *) ptr);
+    case  2: return (double) *((unsigned char      *) ptr);
+    case  3: return (double) *((short              *) ptr);
+    case  4: return (double) *((unsigned short     *) ptr);
+    case  5: return (double) *((int                *) ptr);
+    case  6: return (double) *((unsigned           *) ptr);
+    case  7: return (double) *((long               *) ptr);
+    case  8: return (double) *((unsigned long      *) ptr);
+    case  9: return (double) *((long long          *) ptr);
+    case 10: return (double) *((unsigned long long *) ptr);
+    default:
+    case 11: return (double) *((float              *) ptr);
+    case 12: return          *((double             *) ptr);
+    case 13: return (double) *((long double        *) ptr);
+  }
+}
+//----------------------------------------------------------------------------
 // type id by name table
 qplot_type_name_t qplot_types_name[] = {
 //{ int id, const char *name     }
   {  1, "char"                   },
+  {  1, "signed char"            },
   {  2, "unsigned char"          },
   {  3, "short"                  },
   {  3, "short int"              },
+  {  3, "signed short"           },
+  {  3, "signed short int"       },
   {  4, "unsigned short"         },
   {  4, "unsigned short int"     },
   {  5, "int"                    },
+  {  5, "signed int"             },
   {  6, "unsigned"               },
   {  6, "unsigned int"           },
   {  7, "long"                   },
   {  7, "long int"               },
+  {  7, "signed long"            },
+  {  7, "signed long int"        },
   {  8, "unsigned long"          },
-  {  9, "unsigned long int"      },
+  {  8, "unsigned long int"      },
   {  9, "long long"              },
   {  9, "long long int"          },
+  {  9, "signed long long"       },
+  {  9, "signed long long int"   },
   { 10, "unsigned long long"     },
   { 10, "unsigned long long int" },
   { 11, "float"                  },
@@ -69,7 +100,7 @@ qplot_type_size_t qplot_types_size[] = {
   {  6, sizeof(unsigned)               },
   {  7, sizeof(long)                   },
   {  8, sizeof(unsigned long)          },
-  {  9, sizeof(unsigned long int)      },
+  {  9, sizeof(long long)              },
   { 10, sizeof(unsigned long long)     },
   { 11, sizeof(float)                  },
   { 12, sizeof(double)                 },

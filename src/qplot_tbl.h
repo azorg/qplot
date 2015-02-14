@@ -43,6 +43,9 @@ extern qplot_qwt_curve_t  qplot_qwt_curves[];  // qwt curve style by name tab.
 extern qplot_pen_style_t  qplot_pen_styles[];  // qt pen style by name table
 extern qplot_qwt_symbol_t qplot_qwt_symbols[]; // qwt symbol by name table
 //----------------------------------------------------------------------------
+// get field as double
+double qplot_peek(const void *data, int offset, int type_id);
+//----------------------------------------------------------------------------
 int qplot_id_by_type(std::string type); // get id by type name
 std::string gplot_type_by_id(int id);   // get type name by id
 int qplot_sizeof_by_id(int id);         // get sizeof() by type id
