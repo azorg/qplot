@@ -212,5 +212,6 @@ QwtSymbol::Style qplot_qwt_symbol_by_name(std::string symbol)
   return p->style; // QwtSymbol::NoSymbol by default
 }
 //----------------------------------------------------------------------------
+
 /*** end of "qplot_tbl.cpp" file ***/
 

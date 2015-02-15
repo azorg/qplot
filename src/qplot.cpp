@@ -401,10 +401,8 @@ void qplot_demo(PlotArea *pa)
 
   // create curves data
   int N = 1000; // !!!
-  std::vector<double> t;
-  std::vector<double> x;
-  t.resize(N);
-  x.resize(N);
+  std::vector<double> t(N);
+  std::vector<double> x(N);
 
   for (int i = 0; i < N; i++)
   {
@@ -413,10 +411,8 @@ void qplot_demo(PlotArea *pa)
   }
 
   int n = 27;
-  std::vector<double> fi;
-  std::vector<double> y;
-  fi.resize(n);
-  y.resize(n);
+  std::vector<double> fi(n);
+  std::vector<double> y(n);
 
   for (int i = 0; i < n; i++)
   {
@@ -469,16 +465,18 @@ void qplot_demo(PlotArea *pa)
   //pa->setXYTitle(QwtPlot::xBottom, "t");
   //pa->setXYTitle(QwtPlot::yLeft,   "X");
   //pa->setXYTitle(QwtPlot::yRight,  "Y");
-  //pa->enableXTop(true);   // ui->pa->enableAxis(QwtPlot::xTop);
-  //pa->enableYRight(true); // ui->pa->enableAxis(QwtPlot::yRight);
+  pa->enableXBottom();    // ui->pa->enableAxis(QwtPlot::xBottom);
+  pa->enableYLeft();      // ui->pa->enableAxis(QwtPlot::yLeft);
+  pa->enableXTop(true);   // ui->pa->enableAxis(QwtPlot::xTop);
+  pa->enableYRight(true); // ui->pa->enableAxis(QwtPlot::yRight);
 
   // ox: 0...720, 0...4*M_PI
   pa->setAxisScale(QwtPlot::xBottom, 0., 720.);
   pa->setAxisScale(QwtPlot::xTop,    0., 4*M_PI);
 
   // oy: -1...1, -10...10
-  //pa->setAxisScale(QwtPlot::yLeft,  -1., 1.);
-  //pa->setAxisScale(QwtPlot::yRight, -10., 10.);
+  pa->setAxisScale(QwtPlot::yLeft,  -1., 1.);
+  pa->setAxisScale(QwtPlot::yRight, -10., 10.);
 
   // markers
   //pa->setVLine(100);
@@ -488,4 +486,5 @@ void qplot_demo(PlotArea *pa)
   pa->redraw();
 }
 //----------------------------------------------------------------------------
+
 /*** end of "qplot.cpp" file ***/

@@ -176,8 +176,41 @@ void PlotWin::on_actHelp_triggered()
 {
   qDebug("PlotWin::on_actHelp_triggered() <- "
          "Help->Help");
-  //!!! FIXME
-  //...
+
+  QMessageBox::about(
+    this,
+    tr("QPlot keys binding"),
+    tr(
+      " * Mouse wheel + Ctrl - zoom (magnifier)\n"
+      " * Right mouse button pressed + Ctrl + mouse up/down - zoom (magnifier)\n"
+      " * Midlle mouse button pressed + mouse - shift (panner)\n"
+      " * Shift + right mouse button, ESC, R,  or double click -\n"
+      "     return to base scale\n"
+      " * Shift + arrow keys - up/down scrolling\n"
+      " * Mouse wheel - vertical scroll\n"
+      " * Mouse wheel + Shift - horisintall scrolling\n"
+      " * Shift + left mouse button or C - cursor position to center\n"
+      " * Z - on/off zoom mode\n"
+      " * L - on/off legend\n"
+      " * G - on/off grid\n"
+      " * A - on/off antialiased\n"
+      " * M - set/reset meker\n"
+      " * V - set/reset vertical line\n"
+      " * H - set/reset horisontal line\n"
+      " * F - on/off full screen mode\n"
+      " * Q - Quit from application\n"
+      " * O - open qplot mission INI-file\n"
+      " * S - Auto scale axis\n"
+      " * D - Demo mode\n"
+      "\n"
+      "In zoom on mode:\n"
+      " * Left mouse button - select area zoom\n"
+      " * Right mouse button - back 1 zoom step\n"
+      "\n"
+      "In zoom off mode:\n"
+      " * Left mouse button pressed - view horisontal/vertical line\n"
+      " * Right mouse button - back 1 zoom step\n"
+      ));
 }
 //----------------------------------------------------------------------------
 void PlotWin::on_actAbout_triggered()
@@ -188,9 +221,9 @@ void PlotWin::on_actAbout_triggered()
   QMessageBox::about(
     this,
     tr("About QPlot"),
-    tr("Example plotting tool via Qwt\n"
+    tr("QPLot - 2-d plotting tool based on Qwt project (http://qwt.sf.net)\n"
        "Author: Alex Zorg <azorg@mail.ru>\n"
-       "Licensed by GPLv2"));
+       "Licensed by GPLv2/QWTv1"));
 }
 //----------------------------------------------------------------------------
 void PlotWin::on_actAboutQt_triggered()
@@ -331,4 +364,5 @@ void PlotWin::on_pa_keyOn(QKeyEvent *event)
   event->accept();
 }
 //----------------------------------------------------------------------------
+
 /*** end of "plot_win.cpp" file ***/

@@ -990,4 +990,5 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
   emit keyOn(event);
 }
 //----------------------------------------------------------------------------
+
 /*** end of "plot_area.cpp" file ***/
