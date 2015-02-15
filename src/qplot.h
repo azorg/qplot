@@ -16,17 +16,24 @@
 // QString -> char*
 #define _CS(str) (str.toLocal8Bit().data())
 //----------------------------------------------------------------------------
-// заполнить PlotAreaConf из секции INI-файла
+typedef struct {
+  std::vector<double> x;
+  std::vector<double> y;
+  int size;
+} qplot_xy_t;
+//----------------------------------------------------------------------------
+// fill PlotAreaConf from INI-file section
 bool qplot_read_conf(aclass::aini *f,     // INI-file
                      const char *s,       // section
                      PlotAreaConf *conf); // output data
 //----------------------------------------------------------------------------
+// run by mission INI-file
 bool qplot_run(
   const char  *mission_file, // имя INI-файла задания
   PlotArea    *pa,           // указатель на PlotArea : QwtPlot widget
   QMainWindow *mw);          // указатель на PlotWin  : QMainWindow
 //----------------------------------------------------------------------------
-// демонстрационное построение графиков
+// demo mode
 void qplot_demo(PlotArea *pa);
 //----------------------------------------------------------------------------
 #endif // QPLOT_H

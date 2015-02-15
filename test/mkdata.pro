@@ -1,4 +1,4 @@
-TARGET = mkdatabin
+TARGET = mkdata
 TEMPLATE = app
 
 CONFIG += silent
@@ -16,7 +16,7 @@ INCLUDEPATH += \
 SOURCES += \
   ../../clib/str.c \
   ../../clib/ini.c \
-  mkdatabin.cpp \
+  mkdata.cpp \
 
 HEADERS += \
   ../../clib/str.h \

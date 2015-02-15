@@ -4,6 +4,10 @@
  */
 //----------------------------------------------------------------------------
 #include <stdio.h>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
 #include "qplot.h"
 #include "qplot_tbl.h"
 //----------------------------------------------------------------------------
@@ -20,7 +24,7 @@
 // ignore case string compare (std::string std, const char *cstr)
 #define _STRCMP(std, cstr) str_icmp_cc(std.c_str(), cstr)
 //----------------------------------------------------------------------------
-// заполнить PlotAreaConf из секции INI-файла
+// fill PlotAreaConf from INI-file section
 bool qplot_read_conf(aclass::aini *f,    // INI-file
                      const char *s,      // section
                      PlotAreaConf *conf) // output data
@@ -127,7 +131,7 @@ bool qplot_read_conf(aclass::aini *f,    // INI-file
     pa->enableAxis(QwtPlot::axisId, true);              \
   }
 //----------------------------------------------------------------------------
-// установить параметры осей PlotArea из секции INI-файла
+// set axes parametrs from INI-file section
 bool qplot_read_axis(aclass::aini *f, // INI-file
                      const char *s,   // section
                      PlotArea *pa)    // output data
@@ -138,23 +142,24 @@ bool qplot_read_axis(aclass::aini *f, // INI-file
   pa->setAxisAutoScale(QwtPlot::xTop);
   pa->setAxisAutoScale(QwtPlot::yRight);
 
-  // проверить наличие секции
-  if (!f->has_section(s)) return false;
+  // check section exist
+  if (!f->has_section(s))
+    return false;
 
   qDebug("qplot_read_axis(): read section '%s'' in '%s' file",
            s, f->get_fname());
 
-  // название построения
+  // common tittle
   std::string title = f->read_str(s, "title", "");
   pa->setTitle(_QS(title));
 
-  // подписи к осям
+  // axis descritons
   _SET_AXIS_TITLE(f, s, "xBottomTitle", xBottom, pa);
   _SET_AXIS_TITLE(f, s, "xTopTitle",    xTop,    pa);
   _SET_AXIS_TITLE(f, s, "yLeftTitle",   yLeft,   pa);
   _SET_AXIS_TITLE(f, s, "yRightTitle",  yRight,  pa);
 
-  // пределы по осям
+  // axis limits
   _SET_AXIS_SCALE(f, s, "xBottomMin", "xBottomMax", xBottom, pa);
   _SET_AXIS_SCALE(f, s, "xTopMin",    "xTopMax",    xTop,    pa);
   _SET_AXIS_SCALE(f, s, "yLeftMin",   "yLeftMax",   yLeft,   pa);
@@ -163,26 +168,23 @@ bool qplot_read_axis(aclass::aini *f, // INI-file
   return true;
 }
 //----------------------------------------------------------------------------
-static void qplot_read_binary(
+qplot_xy_t qplot_read_binary(
   const std::string file, long start, long size, long step,
-  int recordSize, int xType, int yType, int xOff, int yOff,
-  double **xData, double **yData, int *sizeData)
+  int recordSize, int xType, int yType, int xOff, int yOff)
 {
-  std::vector<double> vx;
-  std::vector<double> vy;
+  qplot_xy_t data;
+  data.size = 0;
 
   FILE *f = fopen(file.c_str(), "rb");
   if (f == (FILE*) NULL)
-  { // can't open data file
-    *sizeData = 0;
-    return;
-  }
+    return data; // can't open data file
 
   char *buf = new char[recordSize];
+  if (!buf)
+    return data; // Oooops!
 
   long cnt = 0;
   long step_cnt = 0;
-
   while (fread(buf, recordSize, 1, f) == 1)
   {
     if (start != 0)
@@ -199,53 +201,61 @@ static void qplot_read_binary(
       break;
     cnt++;
 
-    vx.push_back(qplot_peek((const void*) buf, xOff, xType));
-    vy.push_back(qplot_peek((const void*) buf, yOff, yType));
+    data.x.push_back(qplot_peek((const void*) buf, xOff, xType));
+    data.y.push_back(qplot_peek((const void*) buf, yOff, yType));
   } // while (fread()...)
 
   delete[] buf;
-
   fclose(f);
-
-  //!!! FIXME
-  double *px = new double[cnt];
-  double *py = new double[cnt];
-  for (int i = 0; i < cnt; i++)
-  {
-    px[i] = vx[i];
-    py[i] = vy[i];
-    //printf("#%i: (%g, %g)\n", i, vx[i], vy[i]); //!!! FIXME
-  }
-  *xData = px;
-  *yData = py;
-  *sizeData = cnt;
+  data.size = cnt;
+  return data;
 }
 //----------------------------------------------------------------------------
-static void qplot_read_text(
+qplot_xy_t qplot_read_text(
   const std::string file, long start, long size, long step,
-  const std::string separator, int xCol, int yCol,
-  double **xData, double **yData, int *sizeData)
+  char separator, int xCol, int yCol)
 {
-  //!!! FIXME
+  qplot_xy_t data;
+  data.size = 0;
 
-  // пока тут заглушка
-  int n = 27;
-  double *fi = new double[n];
-  double *y  = new double[n];
-  for (int i = 0; i < n; i++)
+  long cnt = 0;
+  long step_cnt = 0;
+
+  std::ifstream fs(file.c_str());
+  std::string line;
+  while (std::getline(fs, line))
   {
-    double t  = ((double) i) * 360. * 2. / ((double) n);
-    fi[i] = t * M_PI / 180.;
-    y[i]  = sin(t * M_PI / 180.) * 10;
-  }
+    if (start != 0)
+    {
+      start--;
+      continue;
+    }
 
-  *xData = fi;
-  *yData = y;
-  *sizeData = n;
+    if (step_cnt-- != 0)
+      continue;
+    step_cnt = step - 1;
+
+    if (size != -1 && cnt >= size)
+      break;
+    cnt++;
+
+    std::stringstream str_stream(line);
+    std::string cell;
+    std::vector<std::string> cells;
+    cells.clear();
+
+    while (std::getline(str_stream, cell, separator))
+      cells.push_back(cell);
+
+    data.x.push_back(atof(cells[xCol].c_str()));
+    data.y.push_back(atof(cells[yCol].c_str()));
+  } // while (std::getline(file, line))
+
+  data.size = cnt;
+  return data;
 }
 //----------------------------------------------------------------------------
-// постоить графики на основе файла задания
-// (возвращает false, если ни одного графика не построено)
+// run by mission INI-file
 bool qplot_run(
   const char  *mission_file, // имя INI-файла задания
   PlotArea    *pa,           // указатель на PlotArea : QwtPlot widget
@@ -290,13 +300,12 @@ bool qplot_run(
   int end   = (int) f.read_long("", "end", 100);
   for (int i = begin; i <= end; i++)
   {
+    qplot_xy_t data;
+
     str_t tmp = str_int(i);
     std::string s = str_c(&tmp);
     str_free(&tmp);
     if (!f.has_section(s)) continue;
-
-    double *xData, *yData;
-    int sizeData;
 
     std::string file = f.read_str(s, "file", "");
     if (file.size() == 0) continue;
@@ -328,24 +337,24 @@ bool qplot_run(
       type = f.read_str(s, "yType", "float");
       int yType = qplot_id_by_type(type);
 
-      // прочитать данные из бинарного файла
-      qplot_read_binary(file, start, size, step,
-                        recordSize, xType, yType, xOff, yOff,
-                        &xData, &yData, &sizeData);
+      data = qplot_read_binary(file, start, size, step,
+                               recordSize, xType, yType, xOff, yOff);
     }
     else
     { // text data file format
-      std::string separator = f.read_str(s, "separator", " ");
+      std::string sep = f.read_str(s, "separator", " ");
+      char separator = (sep.size() > 0) ? sep[0] : ' ';
+
       int xCol = (int) f.read_long(s, "xCol", 0);
       int yCol = (int) f.read_long(s, "yCol", 0);
-      qplot_read_text(file, start, size, step,
-                      separator, xCol, yCol,
-                      &xData, &yData, &sizeData);
+
+      data = qplot_read_text(file, start, size, step,
+                             separator, xCol, yCol);
     }
 
-    if (sizeData <= 0)
+    if (data.size <= 0)
     {
-      qDebug("sizeData = %i, skip [%i] section", sizeData, i);
+      qDebug("data.size = %i, skip [%i] section", data.size, i);
       continue;
     }
 
@@ -378,25 +387,25 @@ bool qplot_run(
     axis = f.read_str(s, "axisY", "Left");
     conf.yAxis = !_STRCMP(axis, "Right") ? QwtPlot::yRight : QwtPlot::yLeft;
 
-    pa->addCurve(xData, yData, sizeData, conf /*, false*/);
-
-    delete[] xData;
-    delete[] yData;
+    pa->addCurve(data.x.data(), data.y.data(), data.size, conf /*, false*/);
   } // for (int i = 0; i < num; i++)
 
   pa->redraw();
   return true;
 }
 //----------------------------------------------------------------------------
-// демонстрационное построение графиков
+// demo mode
 void qplot_demo(PlotArea *pa)
 {
   qDebug("qplot_demo()");
 
   // create curves data
   int N = 1000; // !!!
-  double *t  = new double[N];
-  double *x  = new double[N];
+  std::vector<double> t;
+  std::vector<double> x;
+  t.resize(N);
+  x.resize(N);
+
   for (int i = 0; i < N; i++)
   {
     t[i]  = ((double) i) * 360. * 2. / ((double) N);
@@ -404,8 +413,11 @@ void qplot_demo(PlotArea *pa)
   }
 
   int n = 27;
-  double *fi = new double[n];
-  double *y  = new double[n];
+  std::vector<double> fi;
+  std::vector<double> y;
+  fi.resize(n);
+  y.resize(n);
+
   for (int i = 0; i < n; i++)
   {
     double t  = ((double) i) * 360. * 2. / ((double) n);
@@ -425,10 +437,10 @@ void qplot_demo(PlotArea *pa)
   conf.yAxis    = QwtPlot::yLeft;
   //QwtPlotCurve *X =
   pa->addCurve(
-    t,     // указатель на массив X
-    x,     // указатель на массив Y
-    N,     // число точек (X, Y)
-    conf); // параметры отображения графика
+    t.data(), // указатель на массив X
+    x.data(), // указатель на массив Y
+    N,        // число точек (X, Y)
+    conf);    // параметры отображения графика
 
   // добавить график "Y(fi)"
   conf.legend   = "Y(fi)";
@@ -444,18 +456,13 @@ void qplot_demo(PlotArea *pa)
   conf.xAxis    = QwtPlot::xTop;
   conf.yAxis    = QwtPlot::yRight;
   pa->addCurve(
-    fi,     // указатель на массив X
-    y,      // указатель на массив Y
-    n,      // число точек (X, Y)
-    conf,   // параметры отображения графика
-    false); // признак исп. Raw Data
+    fi.data(), // указатель на массив X
+    y.data(),  // указатель на массив Y
+    n,         // число точек (X, Y)
+    conf,      // параметры отображения графика
+    false);    // признак исп. Raw Data
 
   //pa->removeCurve(X);
-
-  delete[] y;
-  delete[] x;
-  delete[] fi;
-  delete[] t;
 
   // axes
   //pa->setXYTitle(QwtPlot::xTop,    "fi");
@@ -474,12 +481,11 @@ void qplot_demo(PlotArea *pa)
   //pa->setAxisScale(QwtPlot::yRight, -10., 10.);
 
   // markers
-  pa->setVLine(100);
-  pa->setHLine(-0.5);
-  pa->setMarker(200., 0.5);
+  //pa->setVLine(100);
+  //pa->setHLine(-0.5);
+  //pa->setMarker(200., 0.5);
 
   pa->redraw();
 }
 //----------------------------------------------------------------------------
 /*** end of "qplot.cpp" file ***/
-

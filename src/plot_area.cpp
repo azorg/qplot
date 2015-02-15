@@ -548,10 +548,24 @@ QwtPlotCurve* PlotArea::addCurve(
   {
     curve->setStyle(conf.curve);
     curve->setPen(conf.pen);
-  }
 
-  // легенда в форме линии
-  //curve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
+    if (conf.curve == QwtPlotCurve::Dots)
+    { // round dots
+      QPen pen = curve->pen();
+      pen.setCapStyle(Qt::RoundCap);
+      curve->setPen(pen);
+    }
+
+    if (conf.curve == QwtPlotCurve::Lines ||
+        conf.curve == QwtPlotCurve::Steps)
+      curve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
+  }
+  else // conf.curve == QwtPlotCurve::NoCurve
+  {
+    // FIXME: fix Qwt bug (draw line in NoCurve mode)
+    curve->setStyle(QwtPlotCurve::Dots);
+    curve->setPen(QPen(QColor(0, 0, 0, 0), 0)); // transparant 100%
+  }
 
   // установить цвета/стиль/размер символов
   if (conf.symStyle != QwtSymbol::NoSymbol)
@@ -559,6 +573,8 @@ QwtPlotCurve* PlotArea::addCurve(
     QwtSymbol *sym = new QwtSymbol(conf.symStyle, conf.symBrush, conf.symPen,
                                    QSize(conf.symSize, conf.symSize));
     curve->setSymbol(sym);
+
+    curve->setLegendAttribute(QwtPlotCurve::LegendShowSymbol);
   }
 
   // привязать к осям

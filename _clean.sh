@@ -24,6 +24,6 @@ rm -f ./qplot.png
 
 PWD=`pwd`
 cd test
-./_clean_all.sh
+./_clean.sh
 cd "$PWD"
 
