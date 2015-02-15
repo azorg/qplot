@@ -9,6 +9,7 @@
 #include <qprinter.h>
 #include <qprintdialog.h>
 #include <qfileinfo.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_renderer.h>
 //----------------------------------------------------------------------------
@@ -97,6 +98,13 @@ PlotArea::PlotArea(QWidget *parent) : QwtPlot(parent)
   this->setContentsMargins( margin, margin, margin, 0);
   setContextMenuPolicy( Qt::NoContextMenu );
 
+  // canvas
+  QwtPlotCanvas *canvas = new QwtPlotCanvas();
+  canvas->setBorderRadius(7);
+  canvas->setLineWidth(1);
+  canvas->setFrameStyle(0); // QFrame::Box | QFrame::Plain
+  setCanvas(canvas);
+
   // tracker
   d_tracker = new PlotAreaTracker(this->canvas());
 
@@ -176,6 +184,10 @@ void PlotArea::setConf(const PlotAreaConf &newConf)
 
   // цвет фона
   setCanvasBackground(d_conf.background);
+  
+  //!!! FIXME
+  //setAutoFillBackground(true);
+  //setPalette(QPalette(d_conf.background));
 
   // zoom
   d_zoomer[0]->setRubberBandPen(d_conf.zoomPen);

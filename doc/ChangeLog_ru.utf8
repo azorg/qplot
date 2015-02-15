@@ -1,4 +1,13 @@
 
+2015.02.15: v0.1a
+ + finish read text/binary files by mission INI-file
+ + add test
+ + add QwtPlotCanvas usage in QwtPlot
+ + add help (keys binding description)
+ * FIRST alpha release (under Linux only)
+ * place source to https://github.com/azorg/qplot.git
+ ! Congratulations!
+
 2015.02.11:
  + проработан полный формат INI-файла заданий (см. example.qplot.ini)
  + начата работа над процедурами разбора файла заданий:
