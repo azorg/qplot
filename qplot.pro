@@ -2,7 +2,7 @@ TARGET = qplot
 TEMPLATE = app
 
 CONFIG += silent
-CONFIG += debug
+#CONFIG += debug
 
 #DEFINES += QT_NO_DEBUG_OUTPUT
 DEFINES += __STDC_FORMAT_MACROS

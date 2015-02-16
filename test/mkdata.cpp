@@ -11,6 +11,7 @@
 #define DATA_BIN_FILE "data.bin"
 #define DATA_TXT_FILE "data.csv"
 #define QPLOT_FILE    "test.qplot.ini"
+#define SEPARATOR     "," // one char only!
 //----------------------------------------------------------------------------
 typedef struct {
   unsigned char ucVal;
@@ -68,9 +69,21 @@ int main()
 
     fwrite((const void*) &rec, sizeof(rec), 1, bin);
 
-    fprintf(txt, "%i, %i, %i, %li, %li, %g, %g, %g\n",
-            (int) rec.ucVal, (int) rec.sVal, rec.iVal, rec.lVal,
-            (long) rec.llVal, (double) rec.fVal, rec.dVal, (double) rec.ldVal); 
+    if (strcmp(SEPARATOR, ",") == 0)
+      fprintf(txt, "%i, %i, %i, %li, %li, %g, %g, %g\n",
+              (int) rec.ucVal, (int) rec.sVal, rec.iVal, rec.lVal,
+              (long) rec.llVal, (double) rec.fVal, rec.dVal,
+              (double) rec.ldVal); 
+    else if (strcmp(SEPARATOR, "\t") == 0)
+      fprintf(txt, "%i\t %i\t %i\t %li\t %li\t %g\t %g\t %g\n",
+              (int) rec.ucVal, (int) rec.sVal, rec.iVal, rec.lVal,
+              (long) rec.llVal, (double) rec.fVal, rec.dVal,
+              (double) rec.ldVal); 
+    else // SEPARATOR == ' '
+      fprintf(txt, "%i  %i  %i  %li  %li  %g  %g  %g\n",
+              (int) rec.ucVal, (int) rec.sVal, rec.iVal, rec.lVal,
+              (long) rec.llVal, (double) rec.fVal, rec.dVal,
+              (double) rec.ldVal); 
   }
   fclose(txt);
   fclose(bin);
@@ -122,19 +135,21 @@ int main()
 
   // text data
   // ---------
-  qini.write_str  ("4", "legend", "sin(3x)");
-  qini.write_str  ("4", "file",   DATA_TXT_FILE);
-  qini.write_long ("4", "step",   1);
-  qini.write_value("4", "format", "txt");
-  qini.write_long ("4", "xCol",   7);
-  qini.write_long ("4", "yCol",   4);
+  qini.write_str  ("4", "legend",    "sin(3x)");
+  qini.write_str  ("4", "file",      DATA_TXT_FILE);
+  qini.write_long ("4", "step",      1);
+  qini.write_value("4", "format",    "txt");
+  qini.write_str  ("4", "separator", SEPARATOR);
+  qini.write_long ("4", "xCol",      7);
+  qini.write_long ("4", "yCol",      4);
 
-  qini.write_str  ("5", "legend", "ellipse");
-  qini.write_str  ("5", "file",   DATA_TXT_FILE);
-  qini.write_long ("5", "step",   1);
-  qini.write_value("5", "format", "txt");
-  qini.write_long ("5", "xCol",   3);
-  qini.write_long ("5", "yCol",   6);
+  qini.write_str  ("5", "legend",    "ellipse");
+  qini.write_str  ("5", "file",      DATA_TXT_FILE);
+  qini.write_long ("5", "step",      1);
+  qini.write_value("5", "format",    "txt");
+  qini.write_str  ("5", "separator", SEPARATOR);
+  qini.write_long ("5", "xCol",      3);
+  qini.write_long ("5", "yCol",      6);
 
   return 0;
 }

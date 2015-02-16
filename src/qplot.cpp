@@ -245,10 +245,27 @@ qplot_xy_t qplot_read_text(
     cells.clear();
 
     while (std::getline(str_stream, cell, separator))
-      cells.push_back(cell);
+    { //!!! FIXME (use standart trim algoritm next time)
+      str_t str = str_cstr(cell.c_str());
+      str_t str_trimmed = str_trim(&str);
+      
+      if (separator == ' ')
+      {
+        if (str_size(&str_trimmed))
+          cells.push_back(str_c(&str_trimmed));
+      }
+      else
+        cells.push_back(str_c(&str_trimmed));
+      
+      str_free(&str_trimmed);
+      str_free(&str);
+    }
 
-    data.x.push_back(atof(cells[xCol].c_str()));
-    data.y.push_back(atof(cells[yCol].c_str()));
+    if (cells[xCol].size() && cells[yCol].size())
+    {
+      data.x.push_back(atof(cells[xCol].c_str()));
+      data.y.push_back(atof(cells[yCol].c_str()));
+    }
   } // while (std::getline(file, line))
 
   data.size = cnt;
