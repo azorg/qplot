@@ -19,7 +19,8 @@ qplot.png
 qplot.jpg
 qplot.pro.user
 
-mkdatabin
-mkdatabin.exe
+mkdata
+mkdata.exe
 data.bin
+data.csv
 

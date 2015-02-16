@@ -80,7 +80,7 @@ int main()
               (long) rec.llVal, (double) rec.fVal, rec.dVal,
               (double) rec.ldVal); 
     else // SEPARATOR == ' '
-      fprintf(txt, "%i  %i  %i  %li  %li  %g  %g  %g\n",
+      fprintf(txt, "%i %i %i %li %li %g %g %g\n",
               (int) rec.ucVal, (int) rec.sVal, rec.iVal, rec.lVal,
               (long) rec.llVal, (double) rec.fVal, rec.dVal,
               (double) rec.ldVal); 

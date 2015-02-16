@@ -32,11 +32,6 @@ $ make -j4 # быстрее на 4-х ядерных процессорах
 или
 #ln -s /usr/local/qwt-6.1.y /usr/local/qwt
 
-* Установить путь к QWT в "qplot.pro":
-QWT = /usr/local/qwt
-или
-QWT = /usr/local/qwt-svn
-
 * Подключить библиотеки QWT, добавить файл /etc/ld.so.conf.d/qwt.conf:
 # qwt configuration
 /usr/local/qwt/lib
@@ -44,13 +39,27 @@ QWT = /usr/local/qwt-svn
 * Скачать с github исходные тексты QPlot:
 $ git clone https://github.com/azorg/qplot.git
 
+* Установить путь к QWT в "qplot.pro":
+QWT = /usr/local/qwt
+или
+QWT = /usr/local/qwt-svn
+
+* установить дополнительные опции с qplot.pro:
+  + включить/выключить отладочную печать qDebug
+  + включить/выключить отладочную информацию для gdb
+  ...
+
 * Собрать приложение:
 $cd ./qplot
 $qmake
 $make -j4
 или запустить ./_make.sh
 
-* скопиролвать qplot в нужную bin директорию, например:
+* Запустить тест:
+cd test
+./_start.sh
+
+* скопиролвать qplot в нужную bin директорию для использования, например:
 sudo cp qplot /usr/local/bin
 или
 sudo cp qplot /usr/opt/bin
