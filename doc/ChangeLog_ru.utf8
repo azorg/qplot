@@ -1,3 +1,5 @@
+2015.02.16: v0.1b
+ * first test and fix under Windows 8
 
 2015.02.15: v0.1a
  + finish read text/binary files by mission INI-file
