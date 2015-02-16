@@ -221,6 +221,9 @@ qplot_xy_t qplot_read_text(
   long cnt = 0;
   long step_cnt = 0;
 
+  if (xCol < 0) xCol = 0;
+  if (yCol < 0) yCol = 0;
+
   std::ifstream fs(file.c_str());
   std::string line;
   while (std::getline(fs, line))
@@ -261,11 +264,12 @@ qplot_xy_t qplot_read_text(
       str_free(&str);
     }
 
-    if (cells[xCol].size() && cells[yCol].size())
-    {
-      data.x.push_back(atof(cells[xCol].c_str()));
-      data.y.push_back(atof(cells[yCol].c_str()));
-    }
+    if ((int) cells.size() > xCol && (int) cells.size() > yCol)
+      if (cells[xCol].size() && cells[yCol].size())
+      {
+        data.x.push_back(atof(cells[xCol].c_str()));
+        data.y.push_back(atof(cells[yCol].c_str()));
+      }
   } // while (std::getline(file, line))
 
   data.size = cnt;

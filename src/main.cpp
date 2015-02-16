@@ -113,11 +113,14 @@ int main(int argc, char *argv[])
   // прочитать положение и размеры главного окна приложения
   int x, y, w, h;
   pw.geometry().getRect(&x, &y, &w, &h);
-  x = f.read_long("", "x",      x);
-  y = f.read_long("", "y",      y);
+  x = f.read_long("", "x", -1);
+  y = f.read_long("", "y", -1);
   w = f.read_long("", "width",  w);
   h = f.read_long("", "height", h);
-  pw.setGeometry(x, y, w, h);
+  if (x < 0 || y < 0)
+    pw.resize(w, h);
+  else
+    pw.setGeometry(x, y, w, h);
 
   // прочитать секцию [area] и настроить PlotAreaConf
   PlotAreaConf conf = pw.pa()->getConf();
