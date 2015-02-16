@@ -91,6 +91,7 @@ int main(int argc, char *argv[])
 #ifndef QPLOT_WIN32
   mission_file = parse_cmd_options(argc, argv);
 #else
+  ini_file = QPLOT_INI_FILE;
   if (argc == 2)
      mission_file = argv[1];
 #endif
@@ -140,7 +141,7 @@ int main(int argc, char *argv[])
   int retv = app.exec();
 
   // сохранить название главного окна приложения
-  f.write_str("", "title", _CS(pw.windowTitle()));
+  //f.write_str("", "title", _CS(pw.windowTitle()));
   
   // сохранить положение и размер главного окна приложения
   pw.geometry().getRect(&x, &y, &w, &h);

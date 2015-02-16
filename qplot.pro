@@ -6,6 +6,7 @@ CONFIG += silent
 
 #DEFINES += QT_NO_DEBUG_OUTPUT
 DEFINES += __STDC_FORMAT_MACROS
+#DEFINES += QPLOT_WIN32
 
 QT += svg
 
@@ -17,6 +18,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 #QWT = /usr/local/qwt-svn
 QWT = /usr/local/qwt
+#QWT=C:/Qwt-6.1.2
 
 LIBS += -L$${QWT}/lib -lqwt
 
@@ -58,4 +60,3 @@ OBJECTS_DIR = $${DESTDIR}/.build/obj
 MOC_DIR     = $${DESTDIR}/.build/moc
 RCC_DIR     = $${DESTDIR}/.build/rcc
 UI_DIR      = $${DESTDIR}/.build/ui
-
