@@ -9,6 +9,7 @@ DEFINES += __STDC_FORMAT_MACROS
 #DEFINES += QPLOT_WIN32
 
 QT += svg
+#QT += concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4) {
   QT += widgets
@@ -25,6 +26,7 @@ LIBS += -L$${QWT}/lib -lqwt
 INCLUDEPATH += \
   $${QWT}/include \
   src \
+  qwt-src \
   clib
 
 SOURCES += \
@@ -60,3 +62,5 @@ OBJECTS_DIR = $${DESTDIR}/.build/obj
 MOC_DIR     = $${DESTDIR}/.build/moc
 RCC_DIR     = $${DESTDIR}/.build/rcc
 UI_DIR      = $${DESTDIR}/.build/ui
+
+

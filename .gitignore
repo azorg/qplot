@@ -24,3 +24,6 @@ mkdata.exe
 data.bin
 data.csv
 
+qwt-src/*.h
+qwt-src/*.cpp
+
