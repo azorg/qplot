@@ -136,12 +136,25 @@ bool qplot_read_axis(aclass::aini *f, // INI-file
                      const char *s,   // section
                      PlotArea *pa)    // output data
 {
+  // enable axis by default
+  pa->enableAxis(QwtPlot::xBottom, true);
+  pa->enableAxis(QwtPlot::yLeft,   true);
+  pa->enableAxis(QwtPlot::xTop,    false);
+  pa->enableAxis(QwtPlot::yRight,  false);
+
+  // reset titles
+  pa->setAxisTitle(QwtPlot::xBottom, "");
+  pa->setAxisTitle(QwtPlot::yLeft,   "");
+  pa->setAxisTitle(QwtPlot::xTop,    "");
+  pa->setAxisTitle(QwtPlot::yRight,  "");
+  pa->setTitle("");
+
   // set autoscale by default
   pa->setAxisAutoScale(QwtPlot::xBottom);
   pa->setAxisAutoScale(QwtPlot::yLeft);
   pa->setAxisAutoScale(QwtPlot::xTop);
   pa->setAxisAutoScale(QwtPlot::yRight);
-
+      
   // check section exist
   if (!f->has_section(s))
     return false;

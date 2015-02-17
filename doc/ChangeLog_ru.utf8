@@ -1,5 +1,7 @@
 2015.02.17:
  + index of record may be used as coordinat if xCol/yCol/xOff/yOff is not set
+ + test build QWT sorces static ander Linux/Windows (add qplot-qwt.pro)
+ * fix: reset axis titles when load new mission INI-file
 
 2015.02.16: v0.1b
  * first test and fix under Windows 8
