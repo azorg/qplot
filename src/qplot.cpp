@@ -175,6 +175,15 @@ qplot_xy_t qplot_read_binary(
   qplot_xy_t data;
   data.size = 0;
 
+  qDebug("qplot_read_binary(file='%s')", file.c_str());
+  
+  if (xOff < 0 && yOff < 0)
+    return data; // stupid mission
+
+  if ((xOff >= 0 && (xOff + qplot_sizeof_by_id(xType)) > recordSize) ||
+      (yOff >= 0 && (yOff + qplot_sizeof_by_id(yType)) > recordSize))
+    return data; // wrong offset
+
   FILE *f = fopen(file.c_str(), "rb");
   if (f == (FILE*) NULL)
     return data; // can't open data file
@@ -199,10 +208,18 @@ qplot_xy_t qplot_read_binary(
 
     if (size != -1 && cnt >= size)
       break;
-    cnt++;
 
-    data.x.push_back(qplot_peek((const void*) buf, xOff, xType));
-    data.y.push_back(qplot_peek((const void*) buf, yOff, yType));
+    if (xOff >= 0)
+      data.x.push_back(qplot_peek((const void*) buf, xOff, xType));
+    else
+      data.x.push_back((double) cnt);
+
+    if (yOff >= 0)
+      data.y.push_back(qplot_peek((const void*) buf, yOff, yType));
+    else
+      data.y.push_back((double) cnt);
+
+    cnt++;
   } // while (fread()...)
 
   delete[] buf;
@@ -218,11 +235,13 @@ qplot_xy_t qplot_read_text(
   qplot_xy_t data;
   data.size = 0;
 
+  qDebug("qplot_read_text(file='%s')", file.c_str());
+  
   long cnt = 0;
   long step_cnt = 0;
 
-  if (xCol < 0) xCol = 0;
-  if (yCol < 0) yCol = 0;
+  if (xCol < 0 && yCol < 0)
+    return data; // stupid mission
 
   std::ifstream fs(file.c_str());
   std::string line;
@@ -240,7 +259,6 @@ qplot_xy_t qplot_read_text(
 
     if (size != -1 && cnt >= size)
       break;
-    cnt++;
 
     std::stringstream str_stream(line);
     std::string cell;
@@ -264,13 +282,36 @@ qplot_xy_t qplot_read_text(
       str_free(&str);
     }
 
-    if ((int) cells.size() > xCol && (int) cells.size() > yCol)
-      if (cells[xCol].size() && cells[yCol].size())
-      {
-        data.x.push_back(atof(cells[xCol].c_str()));
-        data.y.push_back(atof(cells[yCol].c_str()));
-      }
-  } // while (std::getline(file, line))
+    if (yCol < 0)
+    { // xCol >= 0 && yCol < 0
+      if ((int) cells.size() > xCol)
+        if (cells[yCol].size())
+        {
+          data.x.push_back(atof(cells[xCol].c_str()));
+          data.y.push_back((double) cnt);
+        }
+    }
+    else if (xCol < 0)
+    { // xCol < 0 && yCol >= 0
+      if ((int) cells.size() > yCol)
+        if (cells[yCol].size())
+        {
+          data.x.push_back((double) cnt);
+          data.y.push_back(atof(cells[yCol].c_str()));
+        }
+    }
+    else
+    { // xCol >= 0 && yCol >= 0
+      if ((int) cells.size() > xCol && (int) cells.size() > yCol)
+        if (cells[xCol].size() && cells[yCol].size())
+        {
+          data.x.push_back(atof(cells[xCol].c_str()));
+          data.y.push_back(atof(cells[yCol].c_str()));
+        }
+    }
+
+    cnt++;
+  } // while (std::getline(fs, line))
 
   data.size = cnt;
   return data;
@@ -288,7 +329,9 @@ bool qplot_run(
   aclass::aini f(mission_file);
 
   std::string title = f.read_str("", "title", "");
-  if (title.size()) mw->setWindowTitle(_QS(title));
+  if (!title.size())
+    title = mission_file;
+  mw->setWindowTitle("QPlot - " + _QS(title));
 
   QSize wsize = mw->size();
   int width = (int) f.read_long("", "width", -1);
@@ -349,8 +392,8 @@ bool qplot_run(
         continue;
       }
 
-      int xOff = (int) f.read_long(s, "xOff", 0);
-      int yOff = (int) f.read_long(s, "yOff", 0);
+      int xOff = (int) f.read_long(s, "xOff", -1);
+      int yOff = (int) f.read_long(s, "yOff", -1);
 
       std::string type = f.read_str(s, "xType", "float");
       int xType = qplot_id_by_type(type);
@@ -366,8 +409,8 @@ bool qplot_run(
       std::string sep = f.read_str(s, "separator", " ");
       char separator = (sep.size() > 0) ? sep[0] : ' ';
 
-      int xCol = (int) f.read_long(s, "xCol", 0);
-      int yCol = (int) f.read_long(s, "yCol", 0);
+      int xCol = (int) f.read_long(s, "xCol", -1);
+      int yCol = (int) f.read_long(s, "yCol", -1);
 
       data = qplot_read_text(file, start, size, step,
                              separator, xCol, yCol);

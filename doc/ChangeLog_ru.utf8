@@ -1,3 +1,6 @@
+2015.02.17:
+ + index of record may be used as coordinat if xCol/yCol/xOff/yOff is not set
+
 2015.02.16: v0.1b
  * first test and fix under Windows 8
 

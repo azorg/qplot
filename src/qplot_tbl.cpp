@@ -128,8 +128,8 @@ qplot_qwt_curve_t  qplot_qwt_curves[] = {
   { "None",    QwtPlotCurve::NoCurve },
   { "Off",     QwtPlotCurve::NoCurve },
   { "NoCurve", QwtPlotCurve::NoCurve },
-  { "Lines",   QwtPlotCurve::Lines   },
   { "On",      QwtPlotCurve::Lines   }, // default curve if "On"
+  { "Lines",   QwtPlotCurve::Lines   },
   { "Sticks",  QwtPlotCurve::Sticks  },
   { "Steps",   QwtPlotCurve::Steps   },
   { "Dots",    QwtPlotCurve::Dots    },
@@ -140,13 +140,13 @@ qplot_qwt_curve_t  qplot_qwt_curves[] = {
 QwtPlotCurve::CurveStyle qplot_qwt_curve_by_name(std::string curve)
 {
   qplot_qwt_curve_t *p = qplot_qwt_curves;
-  while (strlen(p->name))
+  while (p->name[0] != '\0')
   {
     if (_STRCMP(curve, p->name) == 0)
       return p->style;
     p++;
   }
-  return p->style; // QwtPLotCurve::Lines by default
+  return QwtPlotCurve::Lines; // lines by default
 }
 //----------------------------------------------------------------------------
 // qt pen style by name table
@@ -164,13 +164,13 @@ qplot_pen_style_t qplot_pen_styles[] = {
 Qt::PenStyle qplot_pen_by_name(std::string pen)
 {
   qplot_pen_style_t *p = qplot_pen_styles;
-  while (strlen(p->name))
+  while (p->name[0] != '\0')
   {
     if (_STRCMP(pen, p->name) == 0)
       return p->style;
     p++;
   }
-  return p->style; // Qt::SolidLine by default
+  return Qt::SolidLine; // solid line by default
 }
 //----------------------------------------------------------------------------
 // qwt symbol by name table
@@ -203,13 +203,13 @@ qplot_qwt_symbol_t qplot_qwt_symbols[] = {
 QwtSymbol::Style qplot_qwt_symbol_by_name(std::string symbol)
 {
   qplot_qwt_symbol_t *p = qplot_qwt_symbols;
-  while (strlen(p->name))
+  while (p->name[0] != '\0')
   {
     if (_STRCMP(symbol, p->name) == 0)
       return p->style;
     p++;
   }
-  return p->style; // QwtSymbol::NoSymbol by default
+  return QwtSymbol::NoSymbol; // no symbol by default
 }
 //----------------------------------------------------------------------------
 

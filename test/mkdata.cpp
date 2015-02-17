@@ -7,10 +7,11 @@
 #include <math.h>
 #include "aini.h"
 //----------------------------------------------------------------------------
-#define DATA_SIZE     (1024*10)
+#define DATA_SIZE     10000
 #define DATA_BIN_FILE "data.bin"
 #define DATA_TXT_FILE "data.csv"
-#define QPLOT_FILE    "test.qplot.ini"
+#define QPLOT_FILE1   "test1.qplot.ini"
+#define QPLOT_FILE2   "test2.qplot.ini"
 #define SEPARATOR     "," // one char only!
 //----------------------------------------------------------------------------
 typedef struct {
@@ -88,11 +89,11 @@ int main()
   fclose(txt);
   fclose(bin);
 
-  aclass::aini qini(QPLOT_FILE);
+  // Test #1
+  // -------
+  aclass::aini qini;
+  qini.set_fname(QPLOT_FILE1);
   
-  // binary data
-  // -----------
-
   qini.write_str  ("0", "legend",     "sin(x)");
   qini.write_str  ("0", "file",       DATA_BIN_FILE);
   qini.write_long ("0", "step",       data_size / 32);
@@ -133,8 +134,6 @@ int main()
   qini.write_long ("3", "yOff",       _OFFSET(custom_t, fVal));
   qini.write_str  ("3", "yType",      "float");
 
-  // text data
-  // ---------
   qini.write_str  ("4", "legend",    "sin(3x)");
   qini.write_str  ("4", "file",      DATA_TXT_FILE);
   qini.write_long ("4", "step",      1);
@@ -150,6 +149,27 @@ int main()
   qini.write_str  ("5", "separator", SEPARATOR);
   qini.write_long ("5", "xCol",      3);
   qini.write_long ("5", "yCol",      6);
+
+  qini.save();
+  
+  // Test #2
+  // -------
+  qini.set_fname(QPLOT_FILE2);
+
+  qini.write_str  ("0", "legend",    "1000 * Cos(x)");
+  qini.write_str  ("0", "file",      DATA_TXT_FILE);
+  qini.write_value("0", "format",    "txt");
+  qini.write_str  ("0", "separator", SEPARATOR);
+  qini.write_long ("0", "yCol",      3);
+
+  qini.write_str  ("1", "legend",     "1000 * sin(3x)");
+  qini.write_str  ("1", "file",       DATA_BIN_FILE);
+  qini.write_value("1", "format",     "bin");
+  qini.write_long ("1", "recordSize", sizeof(custom_t));
+  qini.write_long ("1", "yOff",       _OFFSET(custom_t, llVal));
+  qini.write_str  ("1", "yType",      "long long");
+
+  qini.save();
 
   return 0;
 }
