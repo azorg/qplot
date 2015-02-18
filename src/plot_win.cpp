@@ -221,7 +221,8 @@ void PlotWin::on_actAbout_triggered()
   QMessageBox::about(
     this,
     tr("About QPlot"),
-    tr("QPLot - 2-d plotting tool based on Qwt project (http://qwt.sf.net)\n"
+    tr("QPLot - 2-d plotting tool based on Qwt project v"
+       QWT_VERSION_STR " (http://qwt.sf.net)\n"
        "Author: Alex Zorg <azorg@mail.ru>\n"
        "Licensed by GPLv2/QWTv1"));
 }
