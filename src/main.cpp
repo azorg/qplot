@@ -111,16 +111,14 @@ int main(int argc, char *argv[])
   if (title.size()) pw.setWindowTitle(_QS(title));
   
   // прочитать положение и размеры главного окна приложения
-  int x, y, w, h;
-  pw.geometry().getRect(&x, &y, &w, &h);
-  x = f.read_long("", "x", -1);
-  y = f.read_long("", "y", -1);
+  int w = pw.size().width();
+  int h = pw.size().height();
+  int x = f.read_long("", "x", -1);
+  int y = f.read_long("", "y", -1);
   w = f.read_long("", "width",  w);
   h = f.read_long("", "height", h);
-  if (x < 0 || y < 0)
-    pw.resize(w, h);
-  else
-    pw.setGeometry(x, y, w, h);
+  if (x >= 0 && y >= 0) pw.move(x, y);
+  if (w >  0 && h >  0) pw.resize(w, h);
 
   // прочитать секцию [area] и настроить PlotAreaConf
   PlotAreaConf conf = pw.pa()->getConf();
@@ -143,11 +141,11 @@ int main(int argc, char *argv[])
   
   int retv = app.exec();
 
-  // сохранить название главного окна приложения
-  //f.write_str("", "title", _CS(pw.windowTitle()));
-  
   // сохранить положение и размер главного окна приложения
-  pw.geometry().getRect(&x, &y, &w, &h);
+  x = pw.pos().x();
+  y = pw.pos().y();
+  w = pw.size().width();
+  h = pw.size().height();
   f.write_long("", "x",      x);
   f.write_long("", "y",      y);
   f.write_long("", "width",  w);
