@@ -38,7 +38,7 @@ int main()
     "  long           lVal; // offset = %i, sizeof(long) = %i\n"
     "  long long     llVal; // offset = %i, sizeof(long long) = %i\n"
     "  float          fVal; // offset = %i, sizeof(float) = %i\n"
-    "  double         dVal; // offset = %i, sizeof(doubl() = %i\n"
+    "  double         dVal; // offset = %i, sizeof(double) = %i\n"
     "  long double   ldVal; // offset = %i, sizeof(long double) = %i\n"
     "} custom_t;\n",
     _OFFSET(custom_t, ucVal), (int) sizeof(unsigned char),

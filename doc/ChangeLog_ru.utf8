@@ -1,5 +1,6 @@
 2015.02.20: v0.1
  * use move() and resize() instead setGeometry() of main window
+ * static build under Windows via MinGW (release qplot-v0.1-win32-bin) 
 
 2015.02.17:
  + index of record may be used as coordinat if xCol/yCol/xOff/yOff is not set
