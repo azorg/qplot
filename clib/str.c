@@ -6,6 +6,9 @@
  */
 
 //----------------------------------------------------------------------------
+// FIXME: old C comiliers have not va_copy macro
+#define va_copy(dest, src) { dest = src; }
+//----------------------------------------------------------------------------
 #include "str.h"
 //----------------------------------------------------------------------------
 char _str_delim[] = STR_TRIM_DELIMITERS; // default trim delimiters

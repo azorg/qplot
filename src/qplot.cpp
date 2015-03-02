@@ -464,7 +464,8 @@ bool qplot_run(
     axis = f.read_str(s, "axisY", "Left");
     conf.yAxis = !_STRCMP(axis, "Right") ? QwtPlot::yRight : QwtPlot::yLeft;
 
-    pa->addCurve(data.x.data(), data.y.data(), data.size, conf /*, false*/);
+    //pa->addCurve(data.x.data(), data.y.data(), data.size, conf /*, false*/);
+    pa->addCurve(&data.x[0], &data.y[0], data.size, conf /*, false*/);
   } // for (int i = 0; i < num; i++)
 
   pa->redraw();
@@ -510,8 +511,10 @@ void qplot_demo(PlotArea *pa)
   conf.yAxis    = QwtPlot::yLeft;
   //QwtPlotCurve *X =
   pa->addCurve(
-    t.data(), // указатель на массив X
-    x.data(), // указатель на массив Y
+    //t.data(), // указатель на массив X
+    //x.data(), // указатель на массив Y
+    &t[0],    // указатель на массив X
+    &x[0],    // указатель на массив Y
     N,        // число точек (X, Y)
     conf);    // параметры отображения графика
 
@@ -529,8 +532,10 @@ void qplot_demo(PlotArea *pa)
   conf.xAxis    = QwtPlot::xTop;
   conf.yAxis    = QwtPlot::yRight;
   pa->addCurve(
-    fi.data(), // указатель на массив X
-    y.data(),  // указатель на массив Y
+    //fi.data(), // указатель на массив X
+    //y.data(),  // указатель на массив Y
+    &fi[0],    // указатель на массив X
+    &y[0],     // указатель на массив Y
     n,         // число точек (X, Y)
     conf,      // параметры отображения графика
     false);    // признак исп. Raw Data
