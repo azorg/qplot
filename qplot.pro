@@ -18,13 +18,20 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 }
 
 #QWT = /usr/local/qwt-svn
-QWT = /usr/local/qwt
+#QWT = /usr/local/qwt
 #QWT=C:/Qwt-6.1.2
+QWT = /usr/local/qwt-6.1.2
 
-LIBS += -L$${QWT}/lib -lqwt
+QWT_LIB = $${QWT}/lib
+QWT_INC = $${QWT}/include
+
+#QWT_LIB = /usr/lib
+#QWT_INC = /usr/include/qwt
+
+LIBS += -L$${QWT_LIB} -lqwt
 
 INCLUDEPATH += \
-  $${QWT}/include \
+  $${QWT_INC} \
   src \
   qwt-src \
   clib
