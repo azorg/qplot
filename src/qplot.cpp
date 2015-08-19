@@ -302,6 +302,7 @@ qplot_xy_t qplot_read_text(
         {
           data.x.push_back(atof(cells[xCol].c_str()));
           data.y.push_back((double) cnt);
+					cnt++;
         }
     }
     else if (xCol < 0)
@@ -311,6 +312,7 @@ qplot_xy_t qplot_read_text(
         {
           data.x.push_back((double) cnt);
           data.y.push_back(atof(cells[yCol].c_str()));
+					cnt++;
         }
     }
     else
@@ -320,10 +322,9 @@ qplot_xy_t qplot_read_text(
         {
           data.x.push_back(atof(cells[xCol].c_str()));
           data.y.push_back(atof(cells[yCol].c_str()));
+					cnt++;
         }
     }
-
-    cnt++;
   } // while (std::getline(fs, line))
 
   data.size = cnt;
@@ -464,8 +465,9 @@ bool qplot_run(
     axis = f.read_str(s, "axisY", "Left");
     conf.yAxis = !_STRCMP(axis, "Right") ? QwtPlot::yRight : QwtPlot::yLeft;
 
-    //pa->addCurve(data.x.data(), data.y.data(), data.size, conf /*, false*/);
-    pa->addCurve(&data.x[0], &data.y[0], data.size, conf /*, false*/);
+		if (data.size)
+      //pa->addCurve(data.x.data(), data.y.data(), data.size, conf /*, false*/);
+      pa->addCurve(&data.x[0], &data.y[0], data.size, conf /*, false*/);
   } // for (int i = 0; i < num; i++)
 
   pa->redraw();
@@ -509,14 +511,16 @@ void qplot_demo(PlotArea *pa)
   conf.symStyle = QwtSymbol::NoSymbol;
   conf.xAxis    = QwtPlot::xBottom;
   conf.yAxis    = QwtPlot::yLeft;
-  //QwtPlotCurve *X =
-  pa->addCurve(
-    //t.data(), // указатель на массив X
-    //x.data(), // указатель на массив Y
-    &t[0],    // указатель на массив X
-    &x[0],    // указатель на массив Y
-    N,        // число точек (X, Y)
-    conf);    // параметры отображения графика
+
+	if (N)
+    //QwtPlotCurve *X =
+    pa->addCurve(
+      //t.data(), // указатель на массив X
+      //x.data(), // указатель на массив Y
+      &t[0],    // указатель на массив X
+      &x[0],    // указатель на массив Y
+      N,        // число точек (X, Y)
+      conf);    // параметры отображения графика
 
   // добавить график "Y(fi)"
   conf.legend   = "Y(fi)";
