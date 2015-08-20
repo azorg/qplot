@@ -2,12 +2,11 @@ TARGET = qplot
 TEMPLATE = app
 
 CONFIG += silent
-CONFIG += static
 #CONFIG += debug
 
-DEFINES += QT_NO_DEBUG_OUTPUT
+#DEFINES += QT_NO_DEBUG_OUTPUT
 DEFINES += __STDC_FORMAT_MACROS
-DEFINES += QPLOT_WIN32
+#DEFINES += QPLOT_WIN32
 
 QT += svg
 #QT += concurrent
@@ -18,13 +17,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
   DEFINES += HAVE_QT5
 }
 
-#QWT=C:/Qwt-6.1.2
-#QWT_LIB = $${QWT}/lib
-#QWT_INC = $${QWT}/include
-#LIBS += -L$${QWT_LIB} -lqwt
-
 INCLUDEPATH += \
-  $${QWT_INC} \
   src \
   qwt-src \
   clib
@@ -164,7 +157,7 @@ HEADERS += \
   qwt-src/qwt_text_label.h \
   qwt-src/qwt_transform.h \
   qwt-src/qwt_widget_overlay.h
-
+  
 FORMS += \
   ui/plot_win.ui
 

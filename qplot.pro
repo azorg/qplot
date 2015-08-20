@@ -17,11 +17,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
   DEFINES += HAVE_QT5
 }
 
-#QWT = /usr/local/qwt-svn
-#QWT = /usr/local/qwt
-#QWT=C:/Qwt-6.1.2
 QWT = /usr/local/qwt-6.1.2
-
 QWT_LIB = $${QWT}/lib
 QWT_INC = $${QWT}/include
 
@@ -33,7 +29,6 @@ LIBS += -L$${QWT_LIB} -lqwt
 INCLUDEPATH += \
   $${QWT_INC} \
   src \
-  qwt-src \
   clib
 
 SOURCES += \
