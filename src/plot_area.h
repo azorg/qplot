@@ -24,12 +24,12 @@ public:
   PlotAreaConf()
   { // параметры по-умолчанию:
     background      = Qt::white;            // белый фон
-    zoom            = false;                // zoom вкл.
+    zoom            = true;                 // zoom вкл.
     zoomPen         = QPen(Qt::darkMagenta, 0, Qt::SolidLine);
     legend          = false;                // легенда выкл.
     legendBox       = false;                // легенда без рамки
     legendPosition  = QwtPlot::RightLegend; // легенда справа
-    grid            = true;                 // сетка выкл.
+    grid            = true;                 // сетка вкл.
     gridXMin        = true;                 // мелкая сетка по X
     gridYMin        = true;                 // мелкая сетка по Y
     gridMajorPen    = QPen(Qt::darkGray, 0, Qt::DashLine);
