@@ -10,11 +10,12 @@ DEFINES += __STDC_FORMAT_MACROS
 DEFINES += QPLOT_WIN32
 
 QT += svg
-#QT += concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4) {
+  QT += gui
   QT += widgets
   QT += printsupport
+  QT += concurrent
   DEFINES += HAVE_QT5
 }
 
