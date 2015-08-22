@@ -184,7 +184,7 @@ void PlotWin::on_actHelp_triggered()
       " * Mouse wheel + Ctrl - zoom (magnifier)\n"
       " * Right mouse button pressed + Ctrl + mouse up/down - zoom (magnifier)\n"
       " * Midlle mouse button pressed + mouse - shift (panner)\n"
-      " * Shift + right mouse button, ESC, R,  or double click -\n"
+      " * Shift + right mouse button, Esc, R or double click -\n"
       "     return to base scale\n"
       " * Shift + arrow keys - up/down scrolling\n"
       " * Mouse wheel - vertical scroll\n"
@@ -357,8 +357,12 @@ void PlotWin::on_pa_keyOn(QKeyEvent *event)
   if (k == Qt::Key_D) // demo
     qplot_demo(ui->pa);
 
-  if (k == Qt::Key_I) //!!! FIXME debug
-  { //!!! FIXME
+  if (k == Qt::Key_F1) // help
+    on_actHelp_triggered();
+
+  // !!! FIXME easter egg for debug
+  if (k == Qt::Key_I)
+  {
     qplot_run("binary.qplot.ini", ui->pa, this);
   }
 
