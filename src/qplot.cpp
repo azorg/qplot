@@ -443,7 +443,7 @@ bool qplot_run(
 
     conf.pen = QPen(
       QColor(f.read_str(s, "color", "black").c_str()),
-      f.read_double(s, "width", 1.0),
+      f.read_double(s, "width", conf.curve == QwtPlotCurve::Dots ? 3.0 : 1.0),
       qplot_pen_by_name(f.read_str(s, "style", "solid")));
 
     conf.symStyle = qplot_qwt_symbol_by_name(
