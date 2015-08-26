@@ -186,7 +186,7 @@ void PlotWin::on_actHelp_triggered()
       " * Midlle mouse button pressed + mouse - shift (panner)\n"
       " * Shift + right mouse button, Esc, R or double click -\n"
       "     return to base scale\n"
-      " * Shift + arrow keys - up/down scrolling\n"
+      " * Shift + arrow keys or Home/End/PgUp/PgDn - up/down X/Y scrolling\n"
       " * Win/Meta + arrow keys - x/y zoom\n"
       " * Mouse wheel - vertical scroll\n"
       " * Mouse wheel + Shift - horisintall scrolling\n"
@@ -339,6 +339,10 @@ void PlotWin::on_pa_keyOn(QKeyEvent *event)
          (k == Qt::Key_Insert)    ? "Insert"    :
          (k == Qt::Key_Delete)    ? "Delete"    :
          (k == Qt::Key_Backspace) ? "Backspace" :
+         (k == Qt::Key_Home)      ? "Home"      :
+         (k == Qt::Key_End)       ? "End"       :
+         (k == Qt::Key_PageUp)    ? "PageUp"    :
+         (k == Qt::Key_PageDown)  ? "PageDown"  :
          (k >= ' ' && k < 128)    ? key         : "???",
 
          k);

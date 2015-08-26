@@ -954,6 +954,10 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
          (k == Qt::Key_Insert)    ? "Insert"    :
          (k == Qt::Key_Delete)    ? "Delete"    :
          (k == Qt::Key_Backspace) ? "Backspace" :
+         (k == Qt::Key_Home)      ? "Home"      :
+         (k == Qt::Key_End)       ? "End"       :
+         (k == Qt::Key_PageUp)    ? "PageUp"    :
+         (k == Qt::Key_PageDown)  ? "PageDown"  :
          (k >= ' ' && k < 128)    ? key         : "???",
          
          k);
@@ -1043,6 +1047,10 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
     else if (k == Qt::Key_Up)    zoomY( d_conf.zoomYStep); // zoom Y up 
     else if (k == Qt::Key_Down)  zoomY(-d_conf.zoomYStep); // zoom Y down
   }
+  else if (k == Qt::Key_End)      zoomX( d_conf.zoomXStep); // zoom X up
+  else if (k == Qt::Key_Home)     zoomX(-d_conf.zoomXStep); // zoom X down
+  else if (k == Qt::Key_PageUp)   zoomY( d_conf.zoomYStep); // zoom Y up 
+  else if (k == Qt::Key_PageDown) zoomY(-d_conf.zoomYStep); // zoom Y down
 
   emit keyOn(event);
 }
