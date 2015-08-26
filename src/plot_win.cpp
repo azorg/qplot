@@ -187,6 +187,7 @@ void PlotWin::on_actHelp_triggered()
       " * Shift + right mouse button, Esc, R or double click -\n"
       "     return to base scale\n"
       " * Shift + arrow keys - up/down scrolling\n"
+      " * Win/Meta + arrow keys - x/y zoom\n"
       " * Mouse wheel - vertical scroll\n"
       " * Mouse wheel + Shift - horisintall scrolling\n"
       " * Shift + left mouse button or C - cursor position to center\n"

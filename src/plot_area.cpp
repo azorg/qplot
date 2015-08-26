@@ -667,6 +667,44 @@ void PlotArea::scrollY(double yStep)
   replot();
 }
 //----------------------------------------------------------------------------
+// zoom по X [+/- %]
+void PlotArea::zoomX(double zoomStep)
+{
+  qDebug("PlotArea::zoomX(double zoomStep=%g)", zoomStep);
+
+  int xAxisList[] = {QwtPlot::xBottom, QwtPlot::xTop};
+
+  for (int i = 0; i < 2; i++)
+  {
+    int axisId = xAxisList[i];
+    double x1 = axisScaleDiv(axisId).lowerBound();
+    double x2 = axisScaleDiv(axisId).upperBound();
+    double dx = zoomStep * (x2 - x1) / 200.;
+    setAxisScale(axisId, x1 + dx, x2 - dx);
+  }
+
+  replot();
+}
+//----------------------------------------------------------------------------
+// zoom по Y [+/- %]
+void PlotArea::zoomY(double zoomStep)
+{
+  qDebug("PlotArea::zoomY(double zoomStep=%g)", zoomStep);
+
+  int yAxisList[] = {QwtPlot::yLeft, QwtPlot::yRight};
+  
+  for (int i = 0; i < 2; i++)
+  {
+    int axisId = yAxisList[i];
+    double y1 = axisScaleDiv(axisId).lowerBound();
+    double y2 = axisScaleDiv(axisId).upperBound();
+    double dy = zoomStep * (y2 - y1) / 200.;
+    setAxisScale(axisId, y1 + dy, y2 - dy);
+  }
+
+  replot();
+}
+//----------------------------------------------------------------------------
 void PlotArea::center()
 {
   qDebug("PlotArea::center()");
@@ -997,6 +1035,13 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
     else if (k == Qt::Key_Left)  scrollX(-d_conf.scrollXStep); // scroll left
     else if (k == Qt::Key_Up)    scrollY( d_conf.scrollYStep); // scroll up
     else if (k == Qt::Key_Down)  scrollY(-d_conf.scrollYStep); // scroll down
+  }
+  else if (m == Qt::MetaModifier)
+  { // Meta (Win) pressed
+    if      (k == Qt::Key_Right) zoomX(-d_conf.zoomXStep); // zoom X down
+    else if (k == Qt::Key_Left)  zoomX( d_conf.zoomXStep); // zoom X up
+    else if (k == Qt::Key_Up)    zoomY( d_conf.zoomYStep); // zoom Y up 
+    else if (k == Qt::Key_Down)  zoomY(-d_conf.zoomYStep); // zoom Y down
   }
 
   emit keyOn(event);

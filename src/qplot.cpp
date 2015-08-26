@@ -49,7 +49,11 @@ bool qplot_read_conf(aclass::aini *f,    // INI-file
   conf->scrollXStep = f->read_double(s, "scrollXStep", conf->scrollXStep);
   conf->scrollYStep = f->read_double(s, "scrollYStep", conf->scrollYStep);
 
-  // основные цвета
+  // шаг zoom в процентах
+  conf->zoomXStep = f->read_double(s, "zoomXStep", conf->zoomXStep);
+  conf->zoomYStep = f->read_double(s, "zoomYStep", conf->zoomYStep);
+
+	// основные цвета
   _SET_COLOR    (f, s, "background",     conf->background);
   _SET_PEN_COLOR(f, s, "zoomColor",      conf->zoomPen);
   _SET_PEN_COLOR(f, s, "gridMajorColor", conf->gridMajorPen);

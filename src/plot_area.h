@@ -43,6 +43,8 @@ public:
     trackerFont     = QFont("Helvetica", 10, QFont::Bold);
     scrollXStep     = 2.;                   // шаг сдвига/прокрутки по X 2%
     scrollYStep     = 2.;                   // шаг сдвига/прокрутки по Y 2%
+    zoomXStep       = 5.;                   // шаг zoom по X 5%
+    zoomYStep       = 5.;                   // шаг zoom по Y 5%
     vLinePen        = QPen(Qt::blue, 0, Qt::DashDotLine);
     vLineTextColor  = Qt::blue;
     vLineFont       = QFont("Helvetica", 10, QFont::Bold);
@@ -77,6 +79,8 @@ public:
   QFont trackerFont;                      // шрифт трекера
   double scrollXStep;                     // шаг сдвига по X [%]
   double scrollYStep;                     // шаг сдвига по Y [%]
+  double zoomXStep;                       // шаг zoom по X [%]
+  double zoomYStep;                       // шаг zoom по Y [%]
   QPen   vLinePen;                        // тип вертикальной линии маркера
   QColor vLineTextColor;                  // цвет надписи верт. линии
   QFont  vLineFont;                       // шрифт на верт. линии маркера
@@ -204,7 +208,10 @@ public:
   void scrollX(double xStep); // прокрутка по X [+/- %]
   void scrollY(double yStep); // прокрутка по Y [+/- %]
 
-  void center(); // текущее положение курсора в центр
+  void zoomX(double ratio); // zoom по X [+/- %]
+  void zoomY(double ratio); // zoom по Y [+/- %]
+  
+	void center(); // текущее положение курсора в центр
 
   void getXY(double *xBottom, double *xTop,    // сообщить координаты курсора
              double *yLeft,   double *yRight); // по 4-м шкалам
