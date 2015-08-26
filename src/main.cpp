@@ -120,6 +120,11 @@ int main(int argc, char *argv[])
   if (x >= 0 && y >= 0) pw.move(x, y);
   if (w >  0 && h >  0) pw.resize(w, h);
 
+  if (f.read_bool("", "maximized", false))
+    pw.setWindowState(Qt::WindowMaximized);
+  if (f.read_bool("", "fullscreen", false))
+    pw.setWindowState(Qt::WindowFullScreen);
+
   // прочитать секцию [area] и настроить PlotAreaConf
   PlotAreaConf conf = pw.pa()->getConf();
   qplot_read_conf(&f, "area", &conf);
@@ -146,10 +151,19 @@ int main(int argc, char *argv[])
   y = pw.pos().y();
   w = pw.size().width();
   h = pw.size().height();
-  f.write_long("", "x",      x);
-  f.write_long("", "y",      y);
-  f.write_long("", "width",  w);
-  f.write_long("", "height", h);
+  if (pw.windowState() & Qt::WindowMaximized)
+    f.write_bool("", "maximized", true);
+  else if (pw.windowState() & Qt::WindowFullScreen)
+    f.write_bool("", "fullscreen", true);
+  else
+  {
+    f.write_long("", "x",      x);
+    f.write_long("", "y",      y);
+    f.write_long("", "width",  w);
+    f.write_long("", "height", h);
+    if (f.has_ident("", "maximized"))  f.write_bool("", "maximized",  false);
+    if (f.has_ident("", "fullscreen")) f.write_bool("", "fullscreen", false);
+  }
 
   return retv;
 }
