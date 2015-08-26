@@ -1038,8 +1038,8 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
   }
   else if (m == Qt::MetaModifier)
   { // Meta (Win) pressed
-    if      (k == Qt::Key_Right) zoomX(-d_conf.zoomXStep); // zoom X down
-    else if (k == Qt::Key_Left)  zoomX( d_conf.zoomXStep); // zoom X up
+    if      (k == Qt::Key_Right) zoomX( d_conf.zoomXStep); // zoom X up
+    else if (k == Qt::Key_Left)  zoomX(-d_conf.zoomXStep); // zoom X down
     else if (k == Qt::Key_Up)    zoomY( d_conf.zoomYStep); // zoom Y up 
     else if (k == Qt::Key_Down)  zoomY(-d_conf.zoomYStep); // zoom Y down
   }

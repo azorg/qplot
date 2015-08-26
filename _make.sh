@@ -3,9 +3,9 @@
 if [ `uname` = "Linux" ]
 then
   PROC_NUM=`grep processor /proc/cpuinfo | wc -l`
-	OPT="-j $PROC_NUM"
+  OPT="-j $PROC_NUM"
 else
-	OPT="WIN32=1"
+  OPT="WIN32=1"
 fi
 
 #mkdir -p _bin_release
@@ -15,5 +15,5 @@ qmake qplot.pro
 #qmake qplot-qwt.pro
 #qmake qplot-win.pro
 
-echo make $OPT
+make $OPT
 
