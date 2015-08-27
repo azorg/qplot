@@ -203,6 +203,7 @@ void PlotWin::on_actHelp_triggered()
       " * O - open qplot mission INI-file\n"
       " * S - Auto scale axis\n"
       " * D - Demo mode\n"
+      " * F1 - this help\n"
       "\n"
       "In zoom on mode:\n"
       " * Left mouse button - select area zoom\n"
