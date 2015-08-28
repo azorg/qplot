@@ -1040,8 +1040,8 @@ void PlotArea::keyPressEvent(QKeyEvent *event)
     else if (k == Qt::Key_Up)    scrollY( d_conf.scrollYStep); // scroll up
     else if (k == Qt::Key_Down)  scrollY(-d_conf.scrollYStep); // scroll down
   }
-  else if (m == Qt::MetaModifier)
-  { // Meta (Win) pressed
+  else if (m == Qt::ControlModifier)
+  { // Ctrl pressed
     if      (k == Qt::Key_Right) zoomX( d_conf.zoomXStep); // zoom X up
     else if (k == Qt::Key_Left)  zoomX(-d_conf.zoomXStep); // zoom X down
     else if (k == Qt::Key_Up)    zoomY( d_conf.zoomYStep); // zoom Y up 
