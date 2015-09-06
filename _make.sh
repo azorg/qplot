@@ -11,7 +11,8 @@ fi
 #mkdir -p _bin_release
 #mkdir -p _bin_debug
 
-qmake qplot.pro
+qmake qplot.pro QMAKE_CC=clang QMAKE_CXX=clang++
+#qmake qplot.pro
 #qmake qplot-qwt.pro
 #qmake qplot-win.pro
 
