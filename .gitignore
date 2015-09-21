@@ -27,3 +27,7 @@ data.csv
 qwt-src/*.h
 qwt-src/*.cpp
 
+CMakeFiles
+CMakeCache.txt
+
+

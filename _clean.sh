@@ -27,3 +27,5 @@ cd test
 ./_clean.sh
 cd "$PWD"
 
+rm  -f CMakeCache.txt
+rm -rf CMakeFiles
