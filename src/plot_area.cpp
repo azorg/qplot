@@ -749,7 +749,7 @@ void PlotArea::exportImg(QString fname, bool dialog)
               this,
               tr("Export File Name"),
               fname,
-              tr("Image (*.png;*.bmp;*.tiff;*.jpg)"));
+              tr("Image (*.png *.bmp *.tiff *.jpg)"));
 #endif
 
   if (!fname.isEmpty())
