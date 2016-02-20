@@ -371,9 +371,6 @@ bool qplot_run(
   // read [axis] section
   qplot_read_axis(&f, "axis", pa);
 
-  if (!f.has_section("0") && !f.has_section("1"))
-    return false; // no curve section
-
   // remove all old curves
   pa->clear();
 
