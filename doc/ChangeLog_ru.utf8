@@ -1,6 +1,6 @@
 2017.03.15:
  * little fix in reading text format
- + add QPLOP_SKIP_VALUE_STR = "*" - may skip value from text files
+ + add QPLOT_SKIP_VALUE_STR = "*" - may skip value from text files
 
 2016.02.20:
  * litle fix: plot all sections from mission file
