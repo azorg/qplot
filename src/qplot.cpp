@@ -302,11 +302,14 @@ qplot_xy_t qplot_read_text(
     if (yCol < 0)
     { // xCol >= 0 && yCol < 0
       if ((int) cells.size() > xCol)
-        if (cells[yCol].size())
+        if (cells[xCol].size())
         {
-          data.x.push_back(atof(cells[xCol].c_str()));
-          data.y.push_back((double) cnt);
-					cnt++;
+          if (cells[xCol] != QPLOT_SKIP_VALUE_STR)
+          {
+            data.x.push_back(atof(cells[xCol].c_str()));
+            data.y.push_back((double) cnt);
+					  cnt++;
+          }
         }
     }
     else if (xCol < 0)
@@ -314,9 +317,12 @@ qplot_xy_t qplot_read_text(
       if ((int) cells.size() > yCol)
         if (cells[yCol].size())
         {
-          data.x.push_back((double) cnt);
-          data.y.push_back(atof(cells[yCol].c_str()));
-					cnt++;
+          if (cells[yCol] != QPLOT_SKIP_VALUE_STR)
+          {
+            data.x.push_back((double) cnt);
+            data.y.push_back(atof(cells[yCol].c_str()));
+					  cnt++;
+          }
         }
     }
     else
@@ -324,9 +330,13 @@ qplot_xy_t qplot_read_text(
       if ((int) cells.size() > xCol && (int) cells.size() > yCol)
         if (cells[xCol].size() && cells[yCol].size())
         {
-          data.x.push_back(atof(cells[xCol].c_str()));
-          data.y.push_back(atof(cells[yCol].c_str()));
-					cnt++;
+          if (cells[xCol] != QPLOT_SKIP_VALUE_STR && \
+              cells[yCol] != QPLOT_SKIP_VALUE_STR)
+          {
+            data.x.push_back(atof(cells[xCol].c_str()));
+            data.y.push_back(atof(cells[yCol].c_str()));
+					  cnt++;
+          }
         }
     }
   } // while (std::getline(fs, line))

@@ -16,6 +16,9 @@
 // QString -> char*
 #define _CS(str) (str.toLocal8Bit().data())
 //----------------------------------------------------------------------------
+// skip value string
+#define QPLOT_SKIP_VALUE_STR "*"
+//----------------------------------------------------------------------------
 typedef struct {
   std::vector<double> x;
   std::vector<double> y;
