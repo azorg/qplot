@@ -13,8 +13,9 @@ fi
 
 #qmake qplot.pro QMAKE_CC=clang QMAKE_CXX=clang++
 #qmake qplot.pro
-qmake qplot-qwt.pro
+#qmake qplot-qwt.pro
 #qmake qplot-win.pro
+qmake qplot-qt5.pro
 
 make $OPT
 

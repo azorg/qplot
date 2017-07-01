@@ -30,4 +30,5 @@ qwt-src/*.cpp
 CMakeFiles
 CMakeCache.txt
 
+.qmake.stash
 
