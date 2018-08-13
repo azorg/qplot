@@ -18,14 +18,15 @@ greaterThan(QT_MAJOR_VERSION, 4) {
   DEFINES += HAVE_QT5
 }
 
-QWT = /usr/local/qwt-6.1.2
-QWT_LIB = $${QWT}/lib
-QWT_INC = $${QWT}/include
+#QWT = /usr/local/qwt-6.1.2
+#QWT_LIB = $${QWT}/lib
+#QWT_INC = $${QWT}/include
 
-#QWT_LIB = /usr/lib
-#QWT_INC = /usr/include/qwt
+QWT_LIB = /usr/lib
+QWT_INC = /usr/include/qwt
 
-LIBS += -L$${QWT_LIB} -lqwt
+#LIBS += -L$${QWT_LIB} -lqwt
+LIBS += -L$${QWT_LIB} -lqwt-qt5
 
 INCLUDEPATH += \
   $${QWT_INC} \

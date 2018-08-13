@@ -2,6 +2,7 @@
 
 rm -rf ./.build
 rm -f ./Makefile
+rm -f .qmake.stash
 
 #rm -rf ./_bin_debug
 #rm -rf ./_bin_release

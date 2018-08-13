@@ -1,3 +1,8 @@
+2018.08.12:
+ * review, recompile under Debian-9.5 "from box" (Qt-5, Qwt-6)
+
+<-- *** -->
+
 2017.03.15:
  * little fix in reading text format
  + add QPLOT_SKIP_VALUE_STR = "*" - may skip value from text files

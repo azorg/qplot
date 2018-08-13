@@ -11,17 +11,17 @@ QT +=
 LIBS +=
 
 INCLUDEPATH += \
-  ../../clib
+  ../clib
 
 SOURCES += \
-  ../../clib/str.c \
-  ../../clib/ini.c \
+  ../clib/str.c \
+  ../clib/ini.c \
   mkdata.cpp \
 
 HEADERS += \
-  ../../clib/str.h \
-  ../../clib/ini.h \
-  ../../clib/aini.h
+  ../clib/str.h \
+  ../clib/ini.h \
+  ../clib/aini.h
 
 FORMS +=
 RESOURCES += 
