@@ -1,0 +1,75 @@
+  ===============================
+  Установка в (x)ubuntu 14.04 LTS
+  ===============================
+
+* Установить Qt5/designer (Qt5 ver >= 5.2.1) из репозитория Ubuntu 14.04:
+#apt-get install qttools5-dev qt5-default
+
+* Установить qt-creator из репозитория Ubuntu (не обязательно):
+#apt-get install qtcreator
+
+* Примечание: 
+   как оказалось, с qt-4.8.1 из поставки Ubuntu 14.04
+   Qwt-5.2.1 тоже работает
+
+* Установить "свежий" qwt-6.1.x из исходников:
+* (в соответсвии с руководством QWT)
+* можно скачать релиз в qwt-6.1.2.tar.bz2, можно скачать из svn
+$ tar xjfv qwt-6.1.2.tar.bz2
+$ cd qwt-6.1.2
+ИЛИ
+$ svn checkout svn://svn.code.sf.net/p/qwt/code/branches/qwt-6.1 qwt-6.1-svn
+$ cd qwt-6.1-svn
+* далее скомпилируйте и установите Qwt:
+$ qmake
+$ make
+ИЛИ
+$ make -j4 # быстрее на 4-х ядерных процессорах
+# sudo make install
+
+* Сделать вспомагательную символическую ссылку на каталог QWT:
+#ln -s /usr/local/qwt-6.1.x-svn /usr/local/qwt-svn
+или
+#ln -s /usr/local/qwt-6.1.y /usr/local/qwt
+
+* Подключить библиотеки QWT, добавить файл /etc/ld.so.conf.d/qwt.conf:
+# qwt configuration
+/usr/local/qwt/lib
+
+* Скачать с github исходные тексты QPlot:
+$ git clone https://github.com/azorg/qplot.git
+
+* Установить путь к QWT в "qplot.pro":
+QWT = /usr/local/qwt
+или
+QWT = /usr/local/qwt-svn
+
+* установить дополнительные опции с qplot.pro:
+  + включить/выключить отладочную печать qDebug
+  + включить/выключить отладочную информацию для gdb
+  ...
+
+* Собрать приложение:
+$cd ./qplot
+$qmake
+$make -j4
+или запустить ./_make.sh
+
+* Запустить тест:
+cd test
+./_start.sh
+
+* скопиролвать qplot в нужную bin директорию для использования, например:
+sudo cp qplot /usr/local/bin
+или
+sudo cp qplot /usr/opt/bin
+
+  ======================================
+  Установка в Windows (ооООчень коротко)
+  ======================================
+1. Установить Qt с MinGW
+2. Для простоты скопировать mingw32-make.exe как make.exe
+3. Установить Qwt (download, qmake, make, make install)
+4. Прописать путь к Qwt в qplot.pro файле (QWT=C:/Qwt-6.2.1)
+5. Собрать qplot (qmake, make)
+6. Решить проблемы по мере их обнаружения...
